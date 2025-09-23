@@ -1,7 +1,7 @@
 // /src/pages/Groshaat.jsx
 import { useEffect, useRef, useState } from "react";
 import { Button, Card, Container, Group, Loader, NumberInput, Select, Stack, Text, Title } from "@mantine/core";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../supabaseClient.js";
 import { downloadNodeAsPdf } from "../lib/exportSingle.js";
 
 /* Your template */

@@ -1,18 +1,28 @@
-// /src/pages/Goshudh.jsx
-import { useEffect, useRef, useState } from "react";
-import { Button, Card, Container, Group, Loader, NumberInput, Select, Stack, Text, Title } from "@mantine/core";
-import { supabase } from "../supabaseClient";
+import { useEffect, useRef, useState, useMemo } from "react";
+import {
+  Button,
+  Card,
+  Container,
+  Group,
+  Loader,
+  NumberInput,
+  Select,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
+import { supabase } from "../supabaseClient.js";
 import { downloadNodeAsPdf } from "../lib/exportSingle.js";
+import { printNodeDirect } from "../lib/printDirect.js";
 
-/* Templates you already have */
-import { Label_3x4_Goshudh } from "../templates/Label_3x4_Goshudh.jsx";
 import { Label_2x4_Goshudh } from "../templates/Label_2x4_Goshudh.jsx";
+import { Label_3x4_Goshudh } from "../templates/Label_3x4_Goshudh.jsx";
 
 export default function GoshudhPage() {
   const [rows, setRows] = useState([]);
   const [id, setId] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [copies, setCopies] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   const previewRef = useRef(null);
 
@@ -23,7 +33,9 @@ export default function GoshudhPage() {
         .from("simple_labels")
         .select("*")
         .eq("brand", "Goshudh")
+        .in("style_code", ["2x4in", "3x4in"])
         .order("name", { ascending: true });
+
       if (!error) {
         setRows(data || []);
         if (data?.length) setId(String(data[0].id));
@@ -34,50 +46,67 @@ export default function GoshudhPage() {
     })();
   }, []);
 
-  const row = rows.find((r) => String(r.id) === String(id)) || null;
-  const styleCode = (row?.style_code || "").toLowerCase();
+  const row = useMemo(
+    () => rows.find((r) => String(r.id) === String(id)) || null,
+    [rows, id]
+  );
 
-  const handlePrint = async () => {
-    if (!previewRef.current) return;
-    // Decide size by style_code (defaults to 3×4)
-    const is2x4 = styleCode.includes("2x4");
+  const dims = useMemo(() => {
+    if (!row) return { w: 4, h: 3 };
+    if (row.style_code === "2x4in") return { w: 4, h: 2 };
+    return { w: 4, h: 3 }; // default 3x4
+  }, [row]);
+
+  const handleDownload = async () => {
+    if (!previewRef.current || !row) return;
     await downloadNodeAsPdf(previewRef.current, {
-      widthIn: is2x4 ? 4 : 4,
-      heightIn: is2x4 ? 2 : 3,
-      filename: is2x4 ? "goshudh_2x4.pdf" : "goshudh_3x4.pdf",
+      widthIn: dims.w,
+      heightIn: dims.h,
+      filename: `goshudh_${row.name || "label"}.pdf`,
       copies,
+    });
+  };
+
+  const handleDirectPrint = async () => {
+    if (!previewRef.current || !row) return;
+    await printNodeDirect(previewRef.current, {
+      widthIn: dims.w,
+      heightIn: dims.h,
+      copies,
+      title: `Goshudh – ${row.style_code}`,
     });
   };
 
   return (
     <Container size="lg" py="md">
       <Stack gap="md">
-        <Title order={2}>Goshudh — Stickers</Title>
+        <Title order={2}>Goshudh Stickers</Title>
 
         <Group gap="sm" wrap="wrap">
           <Select
             label="Product"
-            placeholder="Select product"
+            placeholder="Select"
             value={id}
             onChange={(v) => setId(v || null)}
+            searchable
+            w={420}
             data={(rows || []).map((r) => ({
               value: String(r.id),
-              label: `${r.name} (${r.net_weight_g}g) — ${r.style_code}`,
+              label: `${r.name} (${r.net_weight_g}g) • ${r.style_code}`,
             }))}
-            searchable
-            nothingFound="No items"
-            w={360}
           />
           <NumberInput
             label="Copies"
             min={1}
-            step={1}
             value={copies}
             onChange={setCopies}
             w={120}
           />
-          <Button onClick={handlePrint} disabled={!row || loading}>
-            Print PDF
+          <Button color="green" onClick={handleDirectPrint} disabled={!row || loading}>
+            Direct Print
+          </Button>
+          <Button color="blue" onClick={handleDownload} disabled={!row || loading}>
+            Download PDF
           </Button>
         </Group>
 
@@ -85,14 +114,21 @@ export default function GoshudhPage() {
 
         {!loading && !row && (
           <Card withBorder p="md">
-            <Text c="dimmed">No selection. Pick a product to preview.</Text>
+            <Text c="dimmed">Pick a product to preview.</Text>
           </Card>
         )}
 
         {!loading && row && (
           <Card withBorder p="sm" style={{ background: "#fff" }}>
-            <div ref={previewRef} style={{ width: styleCode.includes("2x4") ? "4in" : "4in", height: styleCode.includes("2x4") ? "2in" : "3in" }}>
-              {styleCode.includes("2x4") ? (
+            <div
+              ref={previewRef}
+              style={{
+                width: `${dims.w}in`,
+                height: `${dims.h}in`,
+                background: "#fff",
+              }}
+            >
+              {row.style_code === "2x4in" ? (
                 <Label_2x4_Goshudh data={row} />
               ) : (
                 <Label_3x4_Goshudh data={row} />

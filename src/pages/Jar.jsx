@@ -1,4 +1,3 @@
-// /src/pages/Jar.jsx
 import { useEffect, useRef, useState } from "react";
 import {
   Button,
@@ -12,17 +11,15 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../supabaseClient.js";
 import { downloadNodeAsPdf } from "../lib/exportSingle.js";
+import { printNodeDirect } from "../lib/printDirect.js";
 
-// Pair (two-up) 38x25mm label
-// Make sure your template file exports: export function Label_38x25_JarPair({ data }) { ... }
 import { Label_38x25_JarPair } from "../templates/Label_38x25_Jar.jsx";
 
-// mm → inch
 const MM_TO_IN = 0.0393701;
-const WIDTH_IN = 78 * MM_TO_IN;   // two labels (38 + 2 gap + 38) = 78mm total
-const HEIGHT_IN = 25 * MM_TO_IN;  // 25mm tall
+const WIDTH_IN = 38 * MM_TO_IN;
+const HEIGHT_IN = 25 * MM_TO_IN;
 
 export default function JarPage() {
   const [rows, setRows] = useState([]);
@@ -38,15 +35,12 @@ export default function JarPage() {
       const { data, error } = await supabase
         .from("simple_labels")
         .select("*")
-        .eq("style_code", "38x25mm") // <-- ONLY 38x25 rows
+        .eq("style_code", "38x25mm")
         .order("brand", { ascending: true })
         .order("name", { ascending: true });
-
       if (!error) {
         setRows(data || []);
         if (data?.length) setId(String(data[0].id));
-      } else {
-        console.error(error);
       }
       setLoading(false);
     })();
@@ -54,20 +48,30 @@ export default function JarPage() {
 
   const row = rows.find((r) => String(r.id) === String(id)) || null;
 
-  const handlePrint = async () => {
+  const handleDownloadPdf = async () => {
     if (!previewRef.current) return;
     await downloadNodeAsPdf(previewRef.current, {
-      widthIn: WIDTH_IN,
+      widthIn: WIDTH_IN * 2 + 0.08, // because we render pair side by side
       heightIn: HEIGHT_IN,
-      filename: "jar_38x25_pair.pdf",
-      copies, // will duplicate the page N times
+      filename: "jar_38x25.pdf",
+      copies,
+    });
+  };
+
+  const handleDirectPrint = async () => {
+    if (!previewRef.current) return;
+    await printNodeDirect(previewRef.current, {
+      widthIn: WIDTH_IN * 2 + 0.08,
+      heightIn: HEIGHT_IN,
+      copies,
+      title: "Jar Sticker 38x25",
     });
   };
 
   return (
     <Container size="lg" py="md">
       <Stack gap="md">
-        <Title order={2}>Jar Stickers — 38×25 mm (Pair)</Title>
+        <Title order={2}>Jar MRP Stickers — 38×25 mm</Title>
 
         <Group gap="sm" wrap="wrap">
           <Select
@@ -77,7 +81,7 @@ export default function JarPage() {
             onChange={(v) => setId(v || null)}
             data={(rows || []).map((r) => ({
               value: String(r.id),
-              label: `${r.brand ?? ""} ${r.brand ? "— " : ""}${r.name ?? ""} (${r.net_weight_g ?? "—"}g)`,
+              label: `${r.brand} — ${r.name} (${r.net_weight_g}g)`,
             }))}
             searchable
             nothingFound="No items"
@@ -91,8 +95,13 @@ export default function JarPage() {
             onChange={setCopies}
             w={120}
           />
-          <Button onClick={handlePrint} disabled={!row || loading}>
-            Print PDF
+
+          {/* Both buttons */}
+          <Button onClick={handleDirectPrint} disabled={!row || loading} color="green">
+            Direct Print
+          </Button>
+          <Button onClick={handleDownloadPdf} disabled={!row || loading} color="blue">
+            Download PDF
           </Button>
         </Group>
 
@@ -109,12 +118,12 @@ export default function JarPage() {
             <div
               ref={previewRef}
               style={{
-                width: `${WIDTH_IN}in`,
+                width: `${WIDTH_IN * 2 + 0.08}in`,
                 height: `${HEIGHT_IN}in`,
                 background: "#fff",
               }}
             >
-              {/* The pair component duplicates the same data on both stickers */}
+              {/* Render pair so you always see both side by side */}
               <Label_38x25_JarPair data={row} />
             </div>
           </Card>
