@@ -1,0 +1,33 @@
+:root{
+  --bg:#0b1020;
+  --panel:#11162a;
+  --ink:#e5e7eb;
+  --muted:#a8b0d8;
+  --border:#1f2937;
+}
+html,body,#root{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+
+/* Label sheet (exact sizes) */
+.sheet{
+  display:grid;
+  gap:0.15in;
+  padding:var(--m);
+  background:#fff;
+  color:#111;
+  border-radius:12px;
+}
+.tile{
+  width:var(--w);
+  height:var(--h);
+  border:1px dashed #cbd5e1;
+  padding:0.06in;
+  display:flex;
+  align-items:center;
+}
+
+@media print{
+  body{-webkit-print-color-adjust:exact; print-color-adjust:exact; background:#fff}
+  .no-print{display:none !important}
+  .sheet{gap:0 !important}
+}

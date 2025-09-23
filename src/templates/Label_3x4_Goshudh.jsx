@@ -1,0 +1,275 @@
+// src/templates/Label_3x4_Goshudh.jsx
+// 3×4 in sticker for Goshudh – ingredient font reduced + Month YYYY dates.
+// - Pkd On: always today's month/year (auto)
+// - Use By: formatted Month YYYY from input (if parsable)
+
+export function Label_3x4_Goshudh({ data }) {
+  if (!data) return null;
+
+  const {
+    name = "—",
+    net_weight_g,
+    batch_no,
+    mrp,
+    // pkd_on is ignored (we always show today)
+    use_by,
+    ingredients,
+    calories,
+    carbohydrates,
+    fats,
+    protein,
+    cholesterol,
+  } = data;
+
+  // Helpers: format Month YYYY (e.g., "September 2025")
+  const formatMonthYear = (date) =>
+    date.toLocaleString("en-IN", { month: "long", year: "numeric" });
+
+  const formatMonthYearFromInput = (val) => {
+    if (!val) return "—";
+    // Try to parse typical ISO-like dates or "Sep 2025" etc.
+    const d = new Date(val);
+    if (!Number.isNaN(d.getTime())) return formatMonthYear(d);
+    // If parsing fails, fall back to the raw text
+    return String(val);
+  };
+
+  const todayMY = formatMonthYear(new Date());      // Pkd On (always today)
+  const useByText = formatMonthYearFromInput(use_by);
+
+  const BORDER = "1px solid #111";
+  const td = {
+    border: BORDER,
+    padding: "2px 6px",
+    lineHeight: 1.12,
+    fontSize: "10px",
+    verticalAlign: "middle",
+  };
+
+  const mrpText =
+    mrp === undefined || mrp === null || mrp === ""
+      ? "—"
+      : `₹${Number(mrp).toFixed(2)}`;
+
+  const batchShort = (batch_no || "—").toString().slice(0, 8);
+
+  // Footer sizing
+  const FSSAI_LOGO_H = 18;
+  const FSSAI_NUM_FS = 9;
+  const STORAGE_FS = 9.5;
+  const SWACHH_H = 25;
+  const BIN_H = 22;
+
+  return (
+    <div
+      style={{
+        width: "4in",
+        height: "3in",
+        background: "#fff",
+        color: "#000",
+        fontFamily: "Arial, Helvetica, sans-serif",
+        boxSizing: "border-box",
+        padding: "8px 12px 4px 12px",
+        display: "grid",
+        gridTemplateRows: "auto 1fr auto auto",
+        rowGap: "4px",
+        overflow: "hidden",
+      }}
+    >
+      {/* Header: Goshudh logo */}
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <img
+          src="/logos/goshudh-header.png"
+          alt="Goshudh"
+          style={{ height: 34, objectFit: "contain" }}
+        />
+      </div>
+
+      {/* Main 2-col area */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1.3fr 1fr",
+          columnGap: "10px",
+          alignItems: "start",
+        }}
+      >
+        {/* LEFT: Ingredients + Nutrition */}
+        <div>
+          <div
+            style={{
+              border: BORDER,
+              padding: "4px 8px",
+              fontWeight: 700,
+              fontSize: 9.75, // reduced font size so long ingredients fit on one line
+              marginBottom: 4,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "clip",
+            }}
+          >
+            Ingredients: {ingredients || name}
+          </div>
+
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              tableLayout: "fixed",
+            }}
+          >
+            <thead>
+              <tr>
+                <th
+                  colSpan={2}
+                  style={{
+                    ...td,
+                    background: "#000",
+                    color: "#fff",
+                    textAlign: "left",
+                    fontWeight: 700,
+                    fontSize: 10,
+                    whiteSpace: "nowrap", // keep "approx" on one line
+                  }}
+                >
+                  NUTRITIONAL VALUE per 100g approx
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={td}>Calories</td>
+                <td style={{ ...td, textAlign: "right" }}>{calories || "0g"}</td>
+              </tr>
+              <tr>
+                <td style={td}>Carbohydrates</td>
+                <td style={{ ...td, textAlign: "right" }}>{carbohydrates || "0g"}</td>
+              </tr>
+              <tr>
+                <td style={td}>Fats</td>
+                <td style={{ ...td, textAlign: "right" }}>{fats || "0g"}</td>
+              </tr>
+              <tr>
+                <td style={td}>Protein</td>
+                <td style={{ ...td, textAlign: "right" }}>{protein || "0g"}</td>
+              </tr>
+              <tr>
+                <td style={td}>Cholestrol</td>
+                <td style={{ ...td, textAlign: "right" }}>{cholesterol || "0g"}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* RIGHT: Facts */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "auto 6px 1fr",
+            rowGap: 5,
+            fontSize: 11,
+          }}
+        >
+          <div style={{ fontWeight: 700 }}>Net Weight.</div>
+          <div>:</div>
+          <div>{net_weight_g ? `${net_weight_g}g` : "—"}</div>
+
+          <div style={{ fontWeight: 700 }}>Batch No.</div>
+          <div>:</div>
+          <div>{batchShort}</div>
+
+          <div style={{ fontWeight: 700 }}>MRP.</div>
+          <div>:</div>
+          <div>
+            {mrpText}
+            <div style={{ fontSize: 9 }}>(incl. of all taxes)</div>
+          </div>
+
+          <div style={{ fontWeight: 700 }}>Pkd On</div>
+          <div>:</div>
+          <div>{todayMY}</div>
+
+          <div style={{ fontWeight: 700 }}>Use By</div>
+          <div>:</div>
+          <div>{useByText}</div>
+        </div>
+      </div>
+
+      {/* Footer strip */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr 1fr",
+          alignItems: "center",
+          justifyItems: "center",
+          paddingTop: 2,
+          columnGap: 12,
+        }}
+      >
+        {/* FSSAI */}
+        <div style={{ textAlign: "center" }}>
+          <img
+            src="/logos/fassai.png"
+            alt="FSSAI"
+            style={{ height: FSSAI_LOGO_H, objectFit: "contain" }}
+          />
+          <div style={{ fontWeight: 600, fontSize: FSSAI_NUM_FS, marginTop: "-5px" }}>
+            10019013001901
+          </div>
+        </div>
+
+        {/* Storage */}
+        <div
+          style={{
+            textAlign: "center",
+            fontWeight: 700,
+            fontSize: STORAGE_FS,
+            lineHeight: 1.1,
+          }}
+        >
+          <div>Store in a</div>
+          <div>cool &amp; dry place</div>
+        </div>
+
+        {/* Swachh Bharat */}
+        <img
+          src="/logos/Swacch-Bharat-Black.png"
+          alt="Swachh Bharat"
+          style={{ height: SWACHH_H, objectFit: "contain" }}
+        />
+
+        {/* (You had a logo here previously—left as-is) */}
+        <img
+          src="/logos/GoshudhWebsiteQRcoode.png"
+          alt="logo"
+          style={{ height: 30, objectFit: "contain" }}
+        />
+      </div>
+
+      {/* Footer text */}
+      <div
+        style={{
+          textAlign: "center",
+          fontWeight: 700,
+          fontSize: 10.5,
+          marginTop: 2,
+        }}
+      >
+        MFG &amp; Packed by : TRINETRA
+      </div>
+      <div
+        style={{
+          textAlign: "center",
+          fontSize: 8.8,
+          lineHeight: 1.2,
+          padding: "0 14px",
+          whiteSpace: "normal",
+        }}
+      >
+        Plot No. 3B, Panch Vatika, Hawa sadak, Civil Lines, Jaipur-302006
+        <br />
+        Customer Care: 9773337333 • customercare@goshudh.com • www.goshudh.com
+      </div>
+    </div>
+  );
+}
