@@ -1,74 +1,108 @@
-// Open a clean print-only window and print the given node at exact inches.
-// Usage: printNodeDirect(ref.current, { widthIn: 4, heightIn: 3, copies: 5, title: "Goshudh 3x4" })
-export async function printNodeDirect(node, { widthIn, heightIn, copies = 1, title = "Label Print" } = {}) {
+// src/lib/printDirect.js
+import html2canvas from "html2canvas";
+
+/**
+ * Direct-print a node at an exact physical page size, with N copies = N pages.
+ * - node: DOM element to print
+ * - widthIn / heightIn: page size in inches (e.g. 4, 3 for 4x3in)
+ * - copies: number of pages to print
+ * - title: optional print job title
+ *
+ * This uses a hidden iframe (no popup tab) and forces one copy per page.
+ */
+export async function printNodeDirect(node, {
+  widthIn,
+  heightIn,
+  copies = 1,
+  title = "Label Print",
+  canvasScale = 3,       // bump for sharper print if needed
+} = {}) {
   if (!node) return;
-  const w = window.open("", "_blank", "noopener,noreferrer");
-  if (!w) return;
 
-  const html = node.outerHTML;
-  const pages = Array.from({ length: Math.max(1, Number(copies) || 1) })
-    .map((_, i) => `<div class="page">${html}</div>`)
-    .join("");
+  // Render the node to an image (so layout is frozen for print)
+  const canvas = await html2canvas(node, {
+    scale: canvasScale,
+    backgroundColor: "#ffffff",
+  });
+  const dataUrl = canvas.toDataURL("image/png");
 
-  // NOTE: @page sets paper size; margins 0 so your label fills the page.
-  // We also set inch dimensions on .page to avoid scaling.
-  w.document.write(`
-    <!doctype html>
-    <html>
-      <head>
-        <meta charset="utf-8" />
-        <title>${title}</title>
-        <base href="${location.origin}/" />
-        <style>
-          @page { size: ${widthIn}in ${heightIn}in; margin: 0; }
-          html, body { padding: 0; margin: 0; }
-          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          .sheet { all: initial; } /* defensive reset, your label uses inline styles */
-          .page {
-            width: ${widthIn}in;
-            height: ${heightIn}in;
-            display: block;
-            page-break-after: always;
-            overflow: hidden;
-          }
-          .page:last-child { page-break-after: auto; }
-        </style>
-      </head>
-      <body>
-        ${pages}
-      </body>
-    </html>
-  `);
+  // Build a print document that locks page size and puts one image per page
+  const pageCSS = `
+    @page { size: ${widthIn}in ${heightIn}in; margin: 0; }
+    @media print {
+      html, body { margin: 0; padding: 0; }
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+    html, body { margin: 0; padding: 0; background: #ffffff; }
+    .page {
+      width: ${widthIn}in;
+      height: ${heightIn}in;
+      display: block;
+      page-break-after: always;
+      overflow: hidden;
+    }
+    .page:last-child { page-break-after: auto; }
+    .fit {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain; /* keep aspect */
+      background: #ffffff;
+    }
+  `;
 
-  // Give images time to load before printing
-  const waitForImages = () =>
-    new Promise((resolve) => {
-      const imgs = w.document.images;
-      if (!imgs || imgs.length === 0) return resolve();
-      let loaded = 0;
-      for (const img of imgs) {
-        if (img.complete) {
-          loaded++;
-          if (loaded === imgs.length) resolve();
-        } else {
-          img.addEventListener("load", () => {
-            loaded++;
-            if (loaded === imgs.length) resolve();
-          });
-          img.addEventListener("error", () => {
-            loaded++;
-            if (loaded === imgs.length) resolve();
-          });
-        }
+  let html = `<!doctype html><html><head><meta charset="utf-8" />
+    <title>${title}</title><style>${pageCSS}</style></head><body>`;
+
+  for (let i = 0; i < Math.max(1, copies); i++) {
+    html += `<div class="page"><img class="fit" src="${dataUrl}" /></div>`;
+  }
+
+  html += `</body></html>`;
+
+  // Create hidden iframe (no new tab)
+  const iframe = document.createElement("iframe");
+  iframe.style.position = "fixed";
+  iframe.style.right = "0";
+  iframe.style.bottom = "0";
+  iframe.style.width = "0";
+  iframe.style.height = "0";
+  iframe.style.border = "0";
+  document.body.appendChild(iframe);
+
+  // Write the print doc into the iframe
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(html);
+  doc.close();
+
+  // Give the browser a tick to layout images, then print
+  const doPrint = () => {
+    try {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    } finally {
+      // Cleanup after a short delay to let print dialog open
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    }
+  };
+
+  // If images haven't loaded yet, wait for load
+  const imgs = doc.images;
+  let pending = imgs.length;
+  if (pending === 0) {
+    doPrint();
+  } else {
+    for (const img of imgs) {
+      if (img.complete) {
+        if (--pending === 0) doPrint();
+      } else {
+        img.onload = img.onerror = () => {
+          if (--pending === 0) doPrint();
+        };
       }
-    });
-
-  w.document.close();
-  await waitForImages();
-
-  // Print & close the tab afterward (the user’s dialog decides printer/copies)
-  w.focus();
-  w.print();
-  // Optional: close after a delay (comment out if you prefer to keep it open)
-  setTimeout(() => { try { w.close(); } catch {} }, 300);
+    }
+  }
 }
