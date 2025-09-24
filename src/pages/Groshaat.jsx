@@ -1,11 +1,24 @@
 // /src/pages/Groshaat.jsx
 import { useEffect, useRef, useState } from "react";
-import { Button, Card, Container, Group, Loader, NumberInput, Select, Stack, Text, Title } from "@mantine/core";
+import {
+  Button,
+  Card,
+  Container,
+  Group,
+  Loader,
+  NumberInput,
+  Select,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { supabase } from "../supabaseClient.js";
 import { downloadNodeAsPdf } from "../lib/exportSingle.js";
-
-/* Your template */
+import { printNodeDirect } from "../lib/printDirect.js";
 import { Label_3x4_Groshaat } from "../templates/Label_3x4_Groshaat.jsx";
+
+const WIDTH_IN = 4;
+const HEIGHT_IN = 3;
 
 export default function GroshaatPage() {
   const [rows, setRows] = useState([]);
@@ -22,7 +35,9 @@ export default function GroshaatPage() {
         .from("simple_labels")
         .select("*")
         .eq("brand", "Groshaat")
+        .eq("style_code", "3x4in")
         .order("name", { ascending: true });
+
       if (!error) {
         setRows(data || []);
         if (data?.length) setId(String(data[0].id));
@@ -33,15 +48,26 @@ export default function GroshaatPage() {
     })();
   }, []);
 
-  const row = rows.find((r) => String(r.id) === String(id)) || null;
+  const row =
+    rows.find((r) => String(r.id) === String(id)) || null;
 
-  const handlePrint = async () => {
+  const handleDownloadPdf = async () => {
     if (!previewRef.current) return;
     await downloadNodeAsPdf(previewRef.current, {
-      widthIn: 4,
-      heightIn: 3,
+      widthIn: WIDTH_IN,
+      heightIn: HEIGHT_IN,
       filename: "groshaat_3x4.pdf",
       copies,
+    });
+  };
+
+  const handleDirectPrint = async () => {
+    if (!previewRef.current) return;
+    await printNodeDirect(previewRef.current, {
+      widthIn: WIDTH_IN,
+      heightIn: HEIGHT_IN,
+      copies,
+      title: "Groshaat Label",
     });
   };
 
@@ -58,7 +84,7 @@ export default function GroshaatPage() {
             onChange={(v) => setId(v || null)}
             data={(rows || []).map((r) => ({
               value: String(r.id),
-              label: `${r.name} (${r.net_weight_g}g) — ${r.style_code}`,
+              label: `${r.name} (${r.net_weight_g}g)`,
             }))}
             searchable
             nothingFound="No items"
@@ -72,8 +98,11 @@ export default function GroshaatPage() {
             onChange={setCopies}
             w={120}
           />
-          <Button onClick={handlePrint} disabled={!row || loading}>
-            Print PDF
+          <Button onClick={handleDownloadPdf} disabled={!row || loading}>
+            Download PDF
+          </Button>
+          <Button onClick={handleDirectPrint} disabled={!row || loading} color="green">
+            Direct Print
           </Button>
         </Group>
 
@@ -87,7 +116,10 @@ export default function GroshaatPage() {
 
         {!loading && row && (
           <Card withBorder p="sm" style={{ background: "#fff" }}>
-            <div ref={previewRef} style={{ width: "4in", height: "3in" }}>
+            <div
+              ref={previewRef}
+              style={{ width: `${WIDTH_IN}in`, height: `${HEIGHT_IN}in` }}
+            >
               <Label_3x4_Groshaat data={row} />
             </div>
           </Card>
