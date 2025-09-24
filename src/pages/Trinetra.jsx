@@ -1,11 +1,26 @@
 // /src/pages/Trinetra.jsx
 import { useEffect, useRef, useState } from "react";
-import { Button, Card, Container, Group, Loader, NumberInput, Select, Stack, Text, Title } from "@mantine/core";
+import {
+  Button,
+  Card,
+  Container,
+  Group,
+  Loader,
+  NumberInput,
+  Select,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { supabase } from "../supabaseClient.js";
 import { downloadNodeAsPdf } from "../lib/exportSingle.js";
+import { printNodeDirect } from "../lib/printDirect.js"; // ✅ NEW
 
 /* Your template */
 import { Label_3x4_Trinetra } from "../templates/Label_3x4_Trinetra.jsx";
+
+const WIDTH_IN = 4;
+const HEIGHT_IN = 3;
 
 export default function TrinetraPage() {
   const [rows, setRows] = useState([]);
@@ -38,10 +53,21 @@ export default function TrinetraPage() {
   const handlePrint = async () => {
     if (!previewRef.current) return;
     await downloadNodeAsPdf(previewRef.current, {
-      widthIn: 4,
-      heightIn: 3,
+      widthIn: WIDTH_IN,
+      heightIn: HEIGHT_IN,
       filename: "trinetra_3x4.pdf",
       copies,
+    });
+  };
+
+  // ✅ New direct print handler
+  const handleDirectPrint = async () => {
+    if (!previewRef.current) return;
+    await printNodeDirect(previewRef.current, {
+      widthIn: WIDTH_IN,
+      heightIn: HEIGHT_IN,
+      copies,
+      title: "Trinetra Label",
     });
   };
 
@@ -74,6 +100,15 @@ export default function TrinetraPage() {
           />
           <Button onClick={handlePrint} disabled={!row || loading}>
             Print PDF
+          </Button>
+
+          {/* ✅ New Direct Print Button */}
+          <Button
+            onClick={handleDirectPrint}
+            disabled={!row || loading}
+            color="green"
+          >
+            Direct Print
           </Button>
         </Group>
 
