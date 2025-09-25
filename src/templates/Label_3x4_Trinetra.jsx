@@ -1,8 +1,5 @@
 // src/templates/Label_3x4_Trinetra.jsx
 // 3×4 in sticker – same layout as Goshudh 3×4, with Trinetra logo + QR.
-// Images:
-//   public/logos/trinetralogo.png
-//   public/logos/trinetraqr.png
 
 export function Label_3x4_Trinetra({ data }) {
   if (!data) return null;
@@ -33,8 +30,20 @@ export function Label_3x4_Trinetra({ data }) {
     return String(val);
   };
 
-  const todayMY = formatMonthYear(new Date());   // Pkd On (always today)
+  const todayMY = formatMonthYear(new Date()); // Pkd On (always today)
   const useByText = formatMonthYearFromInput(use_by);
+
+  // ===== Net Weight formatter =====
+  const formatWeight = (w) => {
+    if (!w && w !== 0) return "—";
+    if (typeof w === "string" && w.toLowerCase().includes("kg")) return w;
+    const num = Number(w);
+    if (isNaN(num)) return w;
+    if (num >= 1000) {
+      return `${(num / 1000).toFixed(num % 1000 === 0 ? 0 : 2)}kg`;
+    }
+    return `${num}g`;
+  };
 
   // ===== Styles =====
   const BORDER = "1px solid #111";
@@ -101,7 +110,7 @@ export function Label_3x4_Trinetra({ data }) {
               border: BORDER,
               padding: "4px 8px",
               fontWeight: 700,
-              fontSize: 9.75,             // ↓ reduced so long names fit
+              fontSize: 9.75,
               marginBottom: 4,
               whiteSpace: "nowrap",
               overflow: "hidden",
@@ -129,7 +138,7 @@ export function Label_3x4_Trinetra({ data }) {
                     textAlign: "left",
                     fontWeight: 700,
                     fontSize: 10,
-                    whiteSpace: "nowrap", // keep "approx" in one line
+                    whiteSpace: "nowrap",
                   }}
                 >
                   NUTRITIONAL VALUE per 100g approx
@@ -172,7 +181,7 @@ export function Label_3x4_Trinetra({ data }) {
         >
           <div style={{ fontWeight: 700 }}>Net Weight.</div>
           <div>:</div>
-          <div>{net_weight_g ? `${net_weight_g}g` : "—"}</div>
+          <div>{formatWeight(net_weight_g)}</div>
 
           <div style={{ fontWeight: 700 }}>Batch No.</div>
           <div>:</div>
@@ -195,7 +204,7 @@ export function Label_3x4_Trinetra({ data }) {
         </div>
       </div>
 
-      {/* Footer strip (even spacing) */}
+      {/* Footer strip */}
       <div
         style={{
           display: "grid",
@@ -206,7 +215,7 @@ export function Label_3x4_Trinetra({ data }) {
           columnGap: 12,
         }}
       >
-        {/* FSSAI block */}
+        {/* FSSAI */}
         <div style={{ textAlign: "center" }}>
           <img
             src="/logos/fassai.png"
@@ -238,7 +247,7 @@ export function Label_3x4_Trinetra({ data }) {
           style={{ height: SWACHH_H, objectFit: "contain" }}
         />
 
-        {/* QR – Trinetra asset */}
+        {/* QR */}
         <div
           style={{
             display: "flex",
