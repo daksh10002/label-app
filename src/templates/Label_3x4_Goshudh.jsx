@@ -11,7 +11,6 @@ export function Label_3x4_Goshudh({ data }) {
     net_weight_g,
     batch_no,
     mrp,
-    // pkd_on is ignored (we always show today)
     use_by,
     ingredients,
     calories,
@@ -27,14 +26,12 @@ export function Label_3x4_Goshudh({ data }) {
 
   const formatMonthYearFromInput = (val) => {
     if (!val) return "—";
-    // Try to parse typical ISO-like dates or "Sep 2025" etc.
     const d = new Date(val);
     if (!Number.isNaN(d.getTime())) return formatMonthYear(d);
-    // If parsing fails, fall back to the raw text
     return String(val);
   };
 
-  const todayMY = formatMonthYear(new Date());      // Pkd On (always today)
+  const todayMY = formatMonthYear(new Date());
   const useByText = formatMonthYearFromInput(use_by);
 
   const BORDER = "1px solid #111";
@@ -53,12 +50,33 @@ export function Label_3x4_Goshudh({ data }) {
 
   const batchShort = (batch_no || "—").toString().slice(0, 8);
 
+  // Format weight smartly: g ↔ kg
+  const formatWeight = (val) => {
+    if (!val) return "—";
+    if (typeof val === "string") {
+      const lower = val.toLowerCase();
+      if (lower.includes("kg") || lower.includes("g")) return val; // already formatted
+      const num = parseFloat(val);
+      if (!isNaN(num)) {
+        return num >= 1000
+          ? `${(num / 1000).toFixed(num % 1000 === 0 ? 0 : 2)}kg`
+          : `${num}g`;
+      }
+      return val;
+    }
+    if (typeof val === "number") {
+      return val >= 1000
+        ? `${(val / 1000).toFixed(val % 1000 === 0 ? 0 : 2)}kg`
+        : `${val}g`;
+    }
+    return "—";
+  };
+
   // Footer sizing
   const FSSAI_LOGO_H = 18;
   const FSSAI_NUM_FS = 9;
   const STORAGE_FS = 9.5;
   const SWACHH_H = 25;
-  const BIN_H = 22;
 
   return (
     <div
@@ -101,7 +119,7 @@ export function Label_3x4_Goshudh({ data }) {
               border: BORDER,
               padding: "4px 8px",
               fontWeight: 700,
-              fontSize: 9.75, // reduced font size so long ingredients fit on one line
+              fontSize: 9.75,
               marginBottom: 4,
               whiteSpace: "nowrap",
               overflow: "hidden",
@@ -129,7 +147,7 @@ export function Label_3x4_Goshudh({ data }) {
                     textAlign: "left",
                     fontWeight: 700,
                     fontSize: 10,
-                    whiteSpace: "nowrap", // keep "approx" on one line
+                    whiteSpace: "nowrap",
                   }}
                 >
                   NUTRITIONAL VALUE per 100g approx
@@ -172,7 +190,7 @@ export function Label_3x4_Goshudh({ data }) {
         >
           <div style={{ fontWeight: 700 }}>Net Weight.</div>
           <div>:</div>
-          <div>{net_weight_g ? `${net_weight_g}g` : "—"}</div>
+          <div>{formatWeight(net_weight_g)}</div>
 
           <div style={{ fontWeight: 700 }}>Batch No.</div>
           <div>:</div>
@@ -238,7 +256,7 @@ export function Label_3x4_Goshudh({ data }) {
           style={{ height: SWACHH_H, objectFit: "contain" }}
         />
 
-        {/* (You had a logo here previously—left as-is) */}
+        {/* QR / Website */}
         <img
           src="/logos/GoshudhWebsiteQRcoode.png"
           alt="logo"
