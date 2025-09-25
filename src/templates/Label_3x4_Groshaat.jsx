@@ -9,7 +9,6 @@ export function Label_3x4_Groshaat({ data }) {
     net_weight_g,
     batch_no,
     mrp,
-    // pkd_on is intentionally ignored (we always show today in Month YYYY)
     use_by,
     ingredients,
     calories,
@@ -30,7 +29,7 @@ export function Label_3x4_Groshaat({ data }) {
     return String(val);
   };
 
-  const todayMY = formatMonthYear(new Date());     // Pkd On (always today)
+  const todayMY = formatMonthYear(new Date()); // Pkd On (always today)
   const useByText = formatMonthYearFromInput(use_by);
 
   const BORDER = "1px solid #111";
@@ -48,6 +47,28 @@ export function Label_3x4_Groshaat({ data }) {
       : `₹${Number(mrp).toFixed(2)}`;
 
   const batchShort = (batch_no || "—").toString().slice(0, 8);
+
+  // ✅ Weight formatter (kg / g)
+  const formatWeight = (val) => {
+    if (!val) return "—";
+    if (typeof val === "string") {
+      const lower = val.toLowerCase();
+      if (lower.includes("kg") || lower.includes("g")) return val;
+      const num = parseFloat(val);
+      if (!isNaN(num)) {
+        return num >= 1000
+          ? `${(num / 1000).toFixed(num % 1000 === 0 ? 0 : 2)}kg`
+          : `${num}g`;
+      }
+      return val;
+    }
+    if (typeof val === "number") {
+      return val >= 1000
+        ? `${(val / 1000).toFixed(val % 1000 === 0 ? 0 : 2)}kg`
+        : `${val}g`;
+    }
+    return "—";
+  };
 
   // Footer sizing
   const FSSAI_LOGO_H = 18;
@@ -97,9 +118,9 @@ export function Label_3x4_Groshaat({ data }) {
               border: BORDER,
               padding: "4px 8px",
               fontWeight: 700,
-              fontSize: 9.75,           // smaller so long names fit
+              fontSize: 9.75,
               marginBottom: 4,
-              whiteSpace: "nowrap",   // single line
+              whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "clip",
             }}
@@ -125,7 +146,7 @@ export function Label_3x4_Groshaat({ data }) {
                     textAlign: "left",
                     fontWeight: 700,
                     fontSize: 10,
-                    whiteSpace: "nowrap", // keep header on one line
+                    whiteSpace: "nowrap",
                   }}
                 >
                   NUTRITIONAL VALUE per 100g approx
@@ -168,7 +189,8 @@ export function Label_3x4_Groshaat({ data }) {
         >
           <div style={{ fontWeight: 700 }}>Net Weight.</div>
           <div>:</div>
-          <div>{net_weight_g ? `${net_weight_g}g` : "—"}</div>
+          {/* ✅ Updated to use formatWeight */}
+          <div>{formatWeight(net_weight_g)}</div>
 
           <div style={{ fontWeight: 700 }}>Batch No.</div>
           <div>:</div>
@@ -213,7 +235,7 @@ export function Label_3x4_Groshaat({ data }) {
             style={{
               fontWeight: 600,
               fontSize: FSSAI_NUM_FS,
-              marginTop: -6, // tighter gap, like Trinetra/Goshudh
+              marginTop: -6,
             }}
           >
             10019013001901
