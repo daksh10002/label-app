@@ -7,7 +7,6 @@ export function Label_2x4_Goshudh({ data }) {
     net_weight_g,
     batch_no,
     mrp,
-    // pkd_on is ignored for display; we always show today's Month YYYY
     use_by,
     ingredients,
     calories,
@@ -25,12 +24,11 @@ export function Label_2x4_Goshudh({ data }) {
     if (!val) return "—";
     const d = new Date(val);
     if (!Number.isNaN(d.getTime())) return formatMonthYear(d);
-    // if it's already like "September 2025" or any non-parseable string, show as-is
     return String(val);
   };
 
-  const pkdOnText = formatMonthYear(new Date());       // always today
-  const useByText = formatMonthYearFromInput(use_by);  // from row
+  const pkdOnText = formatMonthYear(new Date()); // always today
+  const useByText = formatMonthYearFromInput(use_by); // from row
 
   const mrpText =
     mrp === undefined || mrp === null || mrp === ""
@@ -46,6 +44,28 @@ export function Label_2x4_Goshudh({ data }) {
     lineHeight: 1.15,
     verticalAlign: "middle",
     fontSize: "10px",
+  };
+
+  // ✅ Weight formatter (kg / g logic)
+  const formatWeight = (val) => {
+    if (!val) return "—";
+    if (typeof val === "string") {
+      const lower = val.toLowerCase();
+      if (lower.includes("kg") || lower.includes("g")) return val;
+      const num = parseFloat(val);
+      if (!isNaN(num)) {
+        return num >= 1000
+          ? `${(num / 1000).toFixed(num % 1000 === 0 ? 0 : 2)}kg`
+          : `${num}g`;
+      }
+      return val;
+    }
+    if (typeof val === "number") {
+      return val >= 1000
+        ? `${(val / 1000).toFixed(val % 1000 === 0 ? 0 : 2)}kg`
+        : `${val}g`;
+    }
+    return "—";
   };
 
   return (
@@ -69,7 +89,6 @@ export function Label_2x4_Goshudh({ data }) {
       <div
         style={{
           display: "grid",
-          // Wider left column so Ingredients + table have more space
           gridTemplateColumns: "1.2fr 0.8fr",
           columnGap: "6px",
           flex: 1,
@@ -84,7 +103,7 @@ export function Label_2x4_Goshudh({ data }) {
               fontWeight: 700,
               fontSize: "9.5px",
               lineHeight: 1.15,
-              whiteSpace: "nowrap",   // keep on one line
+              whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "clip",
             }}
@@ -164,7 +183,8 @@ export function Label_2x4_Goshudh({ data }) {
         >
           <div style={{ fontWeight: 700 }}>Net Weight.</div>
           <div>:</div>
-          <div>{net_weight_g ? `${net_weight_g}g` : "—"}</div>
+          {/* ✅ Updated to show g or kg */}
+          <div>{formatWeight(net_weight_g)}</div>
 
           <div style={{ fontWeight: 700 }}>Batch No.</div>
           <div>:</div>
@@ -175,7 +195,7 @@ export function Label_2x4_Goshudh({ data }) {
           <div>:</div>
           <div>{mrpText}</div>
 
-          {/* Tax note as its own row, aligned under MRP label */}
+          {/* Tax note */}
           <div></div>
           <div></div>
           <div style={{ fontSize: "8px", marginTop: "-2px" }}>
