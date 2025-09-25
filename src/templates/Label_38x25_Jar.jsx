@@ -25,6 +25,18 @@ function moneyINR(m) {
   return `₹ ${n.toFixed(2)}`;
 }
 
+// ✅ Smart weight formatter (g ↔ kg)
+function formatWeight(w) {
+  if (!w && w !== 0) return "—";
+  if (typeof w === "string" && w.toLowerCase().includes("kg")) return w;
+  const num = Number(w);
+  if (isNaN(num)) return w;
+  if (num >= 1000) {
+    return `${(num / 1000).toFixed(num % 1000 === 0 ? 0 : 2)}kg`;
+  }
+  return `${num}g`;
+}
+
 // ---- Single sticker (38×25 mm) ----
 export function Label_38x25_Jar({ data }) {
   if (!data) return null;
@@ -72,7 +84,7 @@ export function Label_38x25_Jar({ data }) {
           <tr>
             <td style={cellLabel}>Weight</td>
             <td style={cellColon}>:</td>
-            <td style={cellValue}>{net_weight_g ? `${net_weight_g}g` : "—"}</td>
+            <td style={cellValue}>{formatWeight(net_weight_g)}</td>
           </tr>
 
           <tr>
