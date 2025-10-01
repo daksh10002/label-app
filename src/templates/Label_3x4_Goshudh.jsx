@@ -90,12 +90,12 @@ export function Label_3x4_Goshudh({ data }) {
         padding: "8px 12px 4px 12px",
         display: "grid",
         gridTemplateRows: "auto 1fr auto auto",
-        rowGap: "4px",
+        rowGap: "4px", // added row gap for vertical spacing
         overflow: "hidden",
       }}
     >
       {/* Header: Goshudh logo */}
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: "4px" }}>
         <img
           src="/logos/goshudh-header.png"
           alt="Goshudh"
@@ -110,6 +110,7 @@ export function Label_3x4_Goshudh({ data }) {
           gridTemplateColumns: "1.3fr 1fr",
           columnGap: "10px",
           alignItems: "start",
+          rowGap: "6px", // added gap between rows in main grid (helps separate sections vertically)
         }}
       >
         {/* LEFT: Ingredients + Nutrition */}
@@ -120,7 +121,7 @@ export function Label_3x4_Goshudh({ data }) {
               padding: "4px 8px",
               fontWeight: 700,
               fontSize: 9.75,
-              marginBottom: 4,
+              marginBottom: 6, // increased margin bottom for better spacing
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "clip",
@@ -184,7 +185,7 @@ export function Label_3x4_Goshudh({ data }) {
           style={{
             display: "grid",
             gridTemplateColumns: "auto 6px 1fr",
-            rowGap: 5,
+            rowGap: 6, // added gap between facts rows
             fontSize: 11,
           }}
         >
@@ -220,7 +221,7 @@ export function Label_3x4_Goshudh({ data }) {
           gridTemplateColumns: "1fr 1fr 1fr 1fr",
           alignItems: "center",
           justifyItems: "center",
-          paddingTop: 2,
+          paddingTop: 4, // slight increase for breathing space
           columnGap: 12,
         }}
       >
@@ -270,7 +271,7 @@ export function Label_3x4_Goshudh({ data }) {
           textAlign: "center",
           fontWeight: 700,
           fontSize: 10.5,
-          marginTop: 2,
+          marginTop: 6, // increase margin to separate from footer strip
         }}
       >
         MFG &amp; Packed by : TRINETRA
@@ -282,6 +283,7 @@ export function Label_3x4_Goshudh({ data }) {
           lineHeight: 1.2,
           padding: "0 14px",
           whiteSpace: "normal",
+          marginTop: 2, // small margin for spacing
         }}
       >
         Plot No. 3B, Panch Vatika, Hawa sadak, Civil Lines, Jaipur-302006
