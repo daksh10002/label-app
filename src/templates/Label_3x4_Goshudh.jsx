@@ -193,26 +193,26 @@ export function Label_3x4_Goshudh({ data }) {
         >
           <div style={{ fontWeight: 700 }}>Net Weight.</div>
           <div>:</div>
-          <div>{formatWeight(net_weight_g)}</div>
+          <div style={{ fontWeight: 700 }}>{formatWeight(net_weight_g)}</div>
 
           <div style={{ fontWeight: 700 }}>Batch No.</div>
           <div>:</div>
-          <div>{batchShort}</div>
+          <div style={{ fontWeight: 700 }}>{batchShort}</div>
 
           <div style={{ fontWeight: 700 }}>MRP.</div>
           <div>:</div>
-          <div>
+          <div style={{ fontWeight: 700 }}>
             {mrpText}
             <div style={{ fontSize: 9 }}>(incl. of all taxes)</div>
           </div>
 
           <div style={{ fontWeight: 700 }}>Pkd On</div>
           <div>:</div>
-          <div>{todayMY}</div>
+          <div style={{ fontWeight: 700 }}>{todayMY}</div>
 
           <div style={{ fontWeight: 700 }}>Use By</div>
           <div>:</div>
-          <div>{useByText}</div>
+          <div style={{ fontWeight: 700 }}>{useByText}</div>
         </div>
       </div>
 
@@ -281,10 +281,11 @@ export function Label_3x4_Goshudh({ data }) {
       <div
         style={{
           textAlign: "center",
-          fontSize: 8.8,
+          fontSize: 8.6,
           lineHeight: 1.2,
           padding: "0 14px",
           whiteSpace: "normal",
+          fontWeight: 700,
         }}
       >
         Plot No. 3B, Panch Vatika, Hawa sadak, Civil Lines, Jaipur-302006
