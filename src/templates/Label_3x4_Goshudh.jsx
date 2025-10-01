@@ -1,7 +1,4 @@
 // src/templates/Label_3x4_Goshudh.jsx
-// 3×4 in sticker for Goshudh – ingredient font reduced + Month YYYY dates.
-// - Pkd On: always today's month/year (auto)
-// - Use By: formatted Month YYYY from input (if parsable)
 
 export function Label_3x4_Goshudh({ data }) {
   if (!data) return null;
@@ -20,7 +17,6 @@ export function Label_3x4_Goshudh({ data }) {
     cholesterol,
   } = data;
 
-  // Helpers: format Month YYYY (e.g., "September 2025")
   const formatMonthYear = (date) =>
     date.toLocaleString("en-IN", { month: "long", year: "numeric" });
 
@@ -50,12 +46,11 @@ export function Label_3x4_Goshudh({ data }) {
 
   const batchShort = (batch_no || "—").toString().slice(0, 8);
 
-  // Format weight smartly: g ↔ kg
   const formatWeight = (val) => {
     if (!val) return "—";
     if (typeof val === "string") {
       const lower = val.toLowerCase();
-      if (lower.includes("kg") || lower.includes("g")) return val; // already formatted
+      if (lower.includes("kg") || lower.includes("g")) return val;
       const num = parseFloat(val);
       if (!isNaN(num)) {
         return num >= 1000
@@ -72,7 +67,6 @@ export function Label_3x4_Goshudh({ data }) {
     return "—";
   };
 
-  // Footer sizing
   const FSSAI_LOGO_H = 18;
   const FSSAI_NUM_FS = 9;
   const STORAGE_FS = 9.5;
@@ -90,12 +84,19 @@ export function Label_3x4_Goshudh({ data }) {
         padding: "8px 12px 4px 12px",
         display: "grid",
         gridTemplateRows: "auto 1fr auto auto",
-        rowGap: "4px", // added row gap for vertical spacing
+        rowGap: "4px",
         overflow: "hidden",
       }}
     >
-      {/* Header: Goshudh logo */}
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: "4px" }}>
+      {/* Logo */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "15px",     // pushed logo downward
+          marginBottom: "10px",  // consistent spacing below logo
+        }}
+      >
         <img
           src="/logos/goshudh-header.png"
           alt="Goshudh"
@@ -103,17 +104,17 @@ export function Label_3x4_Goshudh({ data }) {
         />
       </div>
 
-      {/* Main 2-col area */}
+      {/* Main Content: Ingredients + Nutrition + Facts */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "1.3fr 1fr",
           columnGap: "10px",
           alignItems: "start",
-          rowGap: "6px", // added gap between rows in main grid (helps separate sections vertically)
+          rowGap: "6px",
         }}
       >
-        {/* LEFT: Ingredients + Nutrition */}
+        {/* LEFT */}
         <div>
           <div
             style={{
@@ -121,7 +122,7 @@ export function Label_3x4_Goshudh({ data }) {
               padding: "4px 8px",
               fontWeight: 700,
               fontSize: 9.75,
-              marginBottom: 6, // increased margin bottom for better spacing
+              marginBottom: 2, // reduced for compact layout
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "clip",
@@ -135,6 +136,7 @@ export function Label_3x4_Goshudh({ data }) {
               width: "100%",
               borderCollapse: "collapse",
               tableLayout: "fixed",
+              marginTop: 4, // added tighter gap after ingredients
             }}
           >
             <thead>
@@ -180,12 +182,12 @@ export function Label_3x4_Goshudh({ data }) {
           </table>
         </div>
 
-        {/* RIGHT: Facts */}
+        {/* RIGHT */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "auto 6px 1fr",
-            rowGap: 6, // added gap between facts rows
+            rowGap: 6,
             fontSize: 11,
           }}
         >
@@ -214,14 +216,14 @@ export function Label_3x4_Goshudh({ data }) {
         </div>
       </div>
 
-      {/* Footer strip */}
+      {/* Footer Strip */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr 1fr 1fr",
           alignItems: "center",
           justifyItems: "center",
-          paddingTop: 4, // slight increase for breathing space
+          paddingTop: 2,
           columnGap: 12,
         }}
       >
@@ -257,21 +259,21 @@ export function Label_3x4_Goshudh({ data }) {
           style={{ height: SWACHH_H, objectFit: "contain" }}
         />
 
-        {/* QR / Website */}
+        {/* QR */}
         <img
           src="/logos/GoshudhWebsiteQRcoode.png"
-          alt="logo"
+          alt="Goshudh QR"
           style={{ height: 30, objectFit: "contain" }}
         />
       </div>
 
-      {/* Footer text */}
+      {/* Footer Text */}
       <div
         style={{
           textAlign: "center",
           fontWeight: 700,
           fontSize: 10.5,
-          marginTop: 6, // increase margin to separate from footer strip
+          marginTop: 4,
         }}
       >
         MFG &amp; Packed by : TRINETRA
@@ -283,7 +285,6 @@ export function Label_3x4_Goshudh({ data }) {
           lineHeight: 1.2,
           padding: "0 14px",
           whiteSpace: "normal",
-          marginTop: 2, // small margin for spacing
         }}
       >
         Plot No. 3B, Panch Vatika, Hawa sadak, Civil Lines, Jaipur-302006
