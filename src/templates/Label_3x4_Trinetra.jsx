@@ -1,5 +1,4 @@
 // src/templates/Label_3x4_Trinetra.jsx
-// 3×4 in sticker – same layout as Goshudh 3×4, with Trinetra logo + QR.
 
 export function Label_3x4_Trinetra({ data }) {
   if (!data) return null;
@@ -9,7 +8,6 @@ export function Label_3x4_Trinetra({ data }) {
     net_weight_g,
     batch_no,
     mrp,
-    // pkd_on is ignored (we always show today)
     use_by,
     ingredients,
     calories,
@@ -19,7 +17,6 @@ export function Label_3x4_Trinetra({ data }) {
     cholesterol,
   } = data;
 
-  // ===== Date helpers (Month YYYY) =====
   const formatMonthYear = (date) =>
     date.toLocaleString("en-IN", { month: "long", year: "numeric" });
 
@@ -30,10 +27,9 @@ export function Label_3x4_Trinetra({ data }) {
     return String(val);
   };
 
-  const todayMY = formatMonthYear(new Date()); // Pkd On (always today)
+  const todayMY = formatMonthYear(new Date());
   const useByText = formatMonthYearFromInput(use_by);
 
-  // ===== Net Weight formatter =====
   const formatWeight = (w) => {
     if (!w && w !== 0) return "—";
     if (typeof w === "string" && w.toLowerCase().includes("kg")) return w;
@@ -45,7 +41,6 @@ export function Label_3x4_Trinetra({ data }) {
     return `${num}g`;
   };
 
-  // ===== Styles =====
   const BORDER = "1px solid #111";
   const td = {
     border: BORDER,
@@ -62,7 +57,6 @@ export function Label_3x4_Trinetra({ data }) {
 
   const batchShort = (batch_no || "—").toString().slice(0, 8);
 
-  // Compact footer sizes (aligned with Goshudh)
   const FSSAI_LOGO_H = 18;
   const FSSAI_NUM_FS = 9;
   const STORAGE_FS = 9.5;
@@ -86,7 +80,14 @@ export function Label_3x4_Trinetra({ data }) {
       }}
     >
       {/* Header: Trinetra logo */}
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "15px",     // shifted down
+          marginBottom: "10px",  // space below logo
+        }}
+      >
         <img
           src="/logos/trinetralogo.png"
           alt="Trinetra"
@@ -94,14 +95,13 @@ export function Label_3x4_Trinetra({ data }) {
         />
       </div>
 
-      {/* Main 2-col area */}
+      {/* Main 2-column area */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "1.25fr 1fr",
           columnGap: "10px",
           alignItems: "start",
-          marginTop: "10px", // Added gap below logo
         }}
       >
         {/* LEFT: Ingredients + Nutrition */}
@@ -112,7 +112,7 @@ export function Label_3x4_Trinetra({ data }) {
               padding: "4px 8px",
               fontWeight: 700,
               fontSize: 9.75,
-              marginBottom: 4,
+              marginBottom: 2, // reduced from 4
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "clip",
@@ -126,6 +126,7 @@ export function Label_3x4_Trinetra({ data }) {
               width: "100%",
               borderCollapse: "collapse",
               tableLayout: "fixed",
+              marginTop: "4px", // tighter gap
             }}
           >
             <thead>
@@ -153,9 +154,7 @@ export function Label_3x4_Trinetra({ data }) {
               </tr>
               <tr>
                 <td style={td}>Carbohydrates</td>
-                <td style={{ ...td, textAlign: "right" }}>
-                  {carbohydrates || "0g"}
-                </td>
+                <td style={{ ...td, textAlign: "right" }}>{carbohydrates || "0g"}</td>
               </tr>
               <tr>
                 <td style={td}>Fats</td>
@@ -225,7 +224,7 @@ export function Label_3x4_Trinetra({ data }) {
             alt="FSSAI"
             style={{ height: FSSAI_LOGO_H, objectFit: "contain" }}
           />
-          <div style={{ fontWeight: 600, fontSize: FSSAI_NUM_FS, marginTop: -7 }}>
+          <div style={{ fontWeight: 600, fontSize: FSSAI_NUM_FS, marginTop:-5 }}>
             10019013001901
           </div>
         </div>
@@ -287,7 +286,7 @@ export function Label_3x4_Trinetra({ data }) {
           textAlign: "center",
           fontSize: 8.8,
           lineHeight: 1.2,
-          padding: "0 14px",
+          padding: "0 20px",
           whiteSpace: "normal",
         }}
       >
