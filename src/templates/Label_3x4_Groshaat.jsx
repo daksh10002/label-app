@@ -235,7 +235,7 @@ export function Label_3x4_Groshaat({ data }) {
             style={{
               fontWeight: 600,
               fontSize: FSSAI_NUM_FS,
-              marginTop: -6,
+              marginTop: 0,
             }}
           >
             10019013001901
