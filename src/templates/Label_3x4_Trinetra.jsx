@@ -101,6 +101,7 @@ export function Label_3x4_Trinetra({ data }) {
           gridTemplateColumns: "1.25fr 1fr",
           columnGap: "10px",
           alignItems: "start",
+          marginTop: "10px", // Added gap below logo
         }}
       >
         {/* LEFT: Ingredients + Nutrition */}
@@ -152,7 +153,9 @@ export function Label_3x4_Trinetra({ data }) {
               </tr>
               <tr>
                 <td style={td}>Carbohydrates</td>
-                <td style={{ ...td, textAlign: "right" }}>{carbohydrates || "0g"}</td>
+                <td style={{ ...td, textAlign: "right" }}>
+                  {carbohydrates || "0g"}
+                </td>
               </tr>
               <tr>
                 <td style={td}>Fats</td>
