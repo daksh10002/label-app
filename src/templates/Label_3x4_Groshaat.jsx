@@ -1,5 +1,3 @@
-// src/templates/Label_3x4_Groshaat.jsx
-
 export function Label_3x4_Groshaat({ data }) {
   if (!data) return null;
 
@@ -90,7 +88,14 @@ export function Label_3x4_Groshaat({ data }) {
       }}
     >
       {/* Header: Groshaat logo */}
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "6px",      // shifted logo down a bit
+          marginBottom: "12px",  // gap below logo
+        }}
+      >
         <img
           src="/logos/Groshaat.png"
           alt="Groshaat"
@@ -105,7 +110,6 @@ export function Label_3x4_Groshaat({ data }) {
           gridTemplateColumns: "1.25fr 1fr",
           columnGap: "10px",
           alignItems: "start",
-          marginTop: "10px", // ✅ Added spacing below logo
         }}
       >
         {/* LEFT: Ingredients + Nutrition */}
@@ -116,7 +120,7 @@ export function Label_3x4_Groshaat({ data }) {
               padding: "4px 8px",
               fontWeight: 700,
               fontSize: 9.75,
-              marginBottom: 4,
+              marginBottom: 2,
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "clip",
@@ -130,6 +134,7 @@ export function Label_3x4_Groshaat({ data }) {
               width: "100%",
               borderCollapse: "collapse",
               tableLayout: "fixed",
+              marginTop: "4px", // reduced gap here
             }}
           >
             <thead>
