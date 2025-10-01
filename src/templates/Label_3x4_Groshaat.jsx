@@ -1,5 +1,4 @@
 // src/templates/Label_3x4_Groshaat.jsx
-// 3×4 in sticker – Groshaat version with Groshaat logo, FSSAI, Swachh Bharat + Dustbin
 
 export function Label_3x4_Groshaat({ data }) {
   if (!data) return null;
@@ -18,7 +17,6 @@ export function Label_3x4_Groshaat({ data }) {
     cholesterol,
   } = data;
 
-  // ===== Date helpers (Month YYYY) =====
   const formatMonthYear = (date) =>
     date.toLocaleString("en-IN", { month: "long", year: "numeric" });
 
@@ -29,7 +27,7 @@ export function Label_3x4_Groshaat({ data }) {
     return String(val);
   };
 
-  const todayMY = formatMonthYear(new Date()); // Pkd On (always today)
+  const todayMY = formatMonthYear(new Date());
   const useByText = formatMonthYearFromInput(use_by);
 
   const BORDER = "1px solid #111";
@@ -48,7 +46,6 @@ export function Label_3x4_Groshaat({ data }) {
 
   const batchShort = (batch_no || "—").toString().slice(0, 8);
 
-  // ✅ Weight formatter (kg / g)
   const formatWeight = (val) => {
     if (!val) return "—";
     if (typeof val === "string") {
@@ -70,7 +67,6 @@ export function Label_3x4_Groshaat({ data }) {
     return "—";
   };
 
-  // Footer sizing
   const FSSAI_LOGO_H = 18;
   const FSSAI_NUM_FS = 9;
   const STORAGE_FS = 9.5;
@@ -109,6 +105,7 @@ export function Label_3x4_Groshaat({ data }) {
           gridTemplateColumns: "1.25fr 1fr",
           columnGap: "10px",
           alignItems: "start",
+          marginTop: "10px", // ✅ Added spacing below logo
         }}
       >
         {/* LEFT: Ingredients + Nutrition */}
@@ -189,7 +186,6 @@ export function Label_3x4_Groshaat({ data }) {
         >
           <div style={{ fontWeight: 700 }}>Net Weight.</div>
           <div>:</div>
-          {/* ✅ Updated to use formatWeight */}
           <div>{formatWeight(net_weight_g)}</div>
 
           <div style={{ fontWeight: 700 }}>Batch No.</div>
@@ -224,7 +220,6 @@ export function Label_3x4_Groshaat({ data }) {
           columnGap: 12,
         }}
       >
-        {/* FSSAI block */}
         <div style={{ textAlign: "center", lineHeight: 1 }}>
           <img
             src="/logos/fassai.png"
@@ -242,7 +237,6 @@ export function Label_3x4_Groshaat({ data }) {
           </div>
         </div>
 
-        {/* Storage */}
         <div
           style={{
             textAlign: "center",
@@ -255,14 +249,12 @@ export function Label_3x4_Groshaat({ data }) {
           <div>cool &amp; dry place</div>
         </div>
 
-        {/* Swachh Bharat */}
         <img
           src="/logos/Swacch-Bharat-Black.png"
           alt="Swachh Bharat"
           style={{ height: SWACHH_H, objectFit: "contain" }}
         />
 
-        {/* Dustbin bigger and left aligned */}
         <div
           style={{
             display: "flex",
@@ -279,7 +271,6 @@ export function Label_3x4_Groshaat({ data }) {
         </div>
       </div>
 
-      {/* Footer text */}
       <div
         style={{
           textAlign: "center",
