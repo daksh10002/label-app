@@ -92,8 +92,8 @@ export function Label_3x4_Groshaat({ data }) {
         style={{
           display: "flex",
           justifyContent: "center",
-          marginTop: "6px",      // shifted logo down a bit
-          marginBottom: "12px",  // gap below logo
+          marginTop: "15px",      // shifted logo down a bit
+          marginBottom: "10px",  // gap below logo
         }}
       >
         <img
