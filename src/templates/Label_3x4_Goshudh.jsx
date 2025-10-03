@@ -282,7 +282,7 @@ export function Label_3x4_Goshudh({ data }) {
         style={{
           textAlign: "center",
           fontSize: 8.6,
-          lineHeight: 1.2,
+          lineHeight: 1,
           padding: "0 14px",
           whiteSpace: "normal",
           fontWeight: 700,
