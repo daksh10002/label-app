@@ -1,19 +1,23 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-// ⬇️ change this line:
 import { createHashRouter, RouterProvider } from "react-router-dom";
 
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 
+// 🧩 Layout
 import AppShellLayout from "./shell/AppShellLayout.jsx";
+
+// 🏷️ Pages
 import Home from "./pages/Home.jsx";
 import GoshudhPage from "./pages/Goshudh.jsx";
 import TrinetraPage from "./pages/Trinetra.jsx";
 import GroshaatPage from "./pages/Groshaat.jsx";
 import JarPage from "./pages/Jar.jsx";
+import KattaPage from "./pages/Katta.jsx";          // ✅ New page added
 import UploadLabels from "./pages/UploadLabels.jsx";
 
+// 🧭 Router setup
 const router = createHashRouter([
   {
     path: "/",
@@ -24,11 +28,13 @@ const router = createHashRouter([
       { path: "trinetra", element: <TrinetraPage /> },
       { path: "groshaat", element: <GroshaatPage /> },
       { path: "jar", element: <JarPage /> },
+      { path: "katta", element: <KattaPage /> },    // ✅ Katta route added
       { path: "upload", element: <UploadLabels /> },
     ],
   },
 ]);
 
+// ⚙️ App entry
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <MantineProvider
