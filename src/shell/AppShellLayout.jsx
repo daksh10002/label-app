@@ -1,4 +1,3 @@
-// src/shell/AppShellLayout.jsx
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   AppShell,
@@ -8,9 +7,9 @@ import {
   Burger,
   Group,
   NavLink,
+  ScrollArea,
   Title,
   Text,
-  ScrollArea,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
@@ -26,7 +25,7 @@ export default function AppShellLayout() {
         breakpoint: "sm",
         collapsed: { mobile: !opened },
       }}
-      withBorder={true}
+      withBorder
       padding="md"
       style={{ background: "#f6f7f9", color: "black" }}
     >
@@ -109,6 +108,15 @@ export default function AppShellLayout() {
             to="/upload"
             label="Upload Labels"
             active={pathname.startsWith("/upload")}
+            styles={{ label: { color: "black" } }}
+          />
+
+          {/* Manage Labels */}
+          <NavLink
+            component={Link}
+            to="/manage"
+            label="Manage Labels"
+            active={pathname.startsWith("/manage")}
             styles={{ label: { color: "black" } }}
           />
         </ScrollArea>
