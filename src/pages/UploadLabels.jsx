@@ -27,7 +27,7 @@ import { supabase } from "../supabaseClient.js";
 // --- CONFIG YOU CAN TWEAK ---
 const ALLOWED_BRANDS = ["Goshudh", "Trinetra", "Groshaat"];
 // The style_code values your app uses
-const ALLOWED_STYLE_CODES = ["2x4in", "3x4in", "38x25mm"];
+const ALLOWED_STYLE_CODES = ["2x4in", "3x4in", "38x25mm","38x24mm"];
 
 // Columns we accept for CSV bulk upload (order not required, header names must match)
 const CSV_COLUMNS = [
