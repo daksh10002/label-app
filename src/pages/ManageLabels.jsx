@@ -29,39 +29,79 @@ export default function ManageLabels() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState(null);
 
-  // pagination
+  // pagination (client-side)
   const [page, setPage] = useState(1);
   const perPage = 100;
   const paginated = filtered.slice((page - 1) * perPage, page * perPage);
 
-  // ---------- Load all labels ----------
+  // ---------- Load all labels (batching to overcome 1000-row PostgREST default) ----------
   async function loadData() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("simple_labels")
-      .select("*")
-      .order("brand", { ascending: true })
-      .order("name", { ascending: true });
-    if (error) setMsg({ type: "error", text: error.message });
-    setRows(data || []);
-    setLoading(false);
+    setMsg(null);
+
+    try {
+      const batchSize = 1000; // Supabase/PostgREST default cap — fetch in chunks of 1000
+      let from = 0;
+      let all = [];
+      while (true) {
+        // request a batch
+        const { data, error } = await supabase
+          .from("simple_labels")
+          .select("*")
+          // stable ordering across batches is important — include a unique indexed column like id
+          .order("brand", { ascending: true })
+          .order("name", { ascending: true })
+          .order("id", { ascending: true })
+          .range(from, from + batchSize - 1);
+
+        if (error) {
+          throw error;
+        }
+
+        if (!data || data.length === 0) {
+          break;
+        }
+
+        all = all.concat(data);
+        // if we received fewer than batchSize rows, that was the last batch
+        if (data.length < batchSize) {
+          break;
+        }
+        // otherwise prepare for next batch
+        from += batchSize;
+      }
+
+      setRows(all);
+      setMsg({ type: "success", text: `Loaded ${all.length} labels` });
+    } catch (error) {
+      setMsg({ type: "error", text: error.message || "Failed to load data" });
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ---------- Filter by search ----------
   useEffect(() => {
-    const q = search.toLowerCase();
-    setFiltered(
-      rows.filter(
-        (r) =>
-          r.name?.toLowerCase().includes(q) ||
-          r.brand?.toLowerCase().includes(q) ||
-          r.batch_no?.toLowerCase().includes(q)
-      )
-    );
+    const q = search.trim().toLowerCase();
+    if (!q) {
+      setFiltered(rows);
+    } else {
+      setFiltered(
+        rows.filter(
+          (r) =>
+            r.name?.toLowerCase().includes(q) ||
+            r.brand?.toLowerCase().includes(q) ||
+            r.batch_no?.toLowerCase().includes(q)
+        )
+      );
+    }
+    setPage(1);
   }, [search, rows]);
 
   // ---------- Delete a label ----------
@@ -69,8 +109,11 @@ export default function ManageLabels() {
     if (!window.confirm(`Delete label "${row.name}" (${row.style_code}) ?`)) return;
     const { error } = await supabase.from("simple_labels").delete().eq("id", row.id);
     if (error) setMsg({ type: "error", text: error.message });
-    else setMsg({ type: "success", text: `Deleted ${row.name}` });
-    loadData();
+    else {
+      setMsg({ type: "success", text: `Deleted ${row.name}` });
+      // remove optimistically from state so UI updates fast
+      setRows((prev) => prev.filter((r) => r.id !== row.id));
+    }
   }
 
   // ---------- Save edits ----------
@@ -78,13 +121,20 @@ export default function ManageLabels() {
     if (!editing) return;
     setSaving(true);
     const { id, ...updates } = editing;
-    const { error } = await supabase.from("simple_labels").update(updates).eq("id", id);
-    setSaving(false);
-    if (error) setMsg({ type: "error", text: error.message });
-    else {
-      setMsg({ type: "success", text: `Updated ${editing.name}` });
-      setEditing(null);
-      loadData();
+    try {
+      const { error } = await supabase.from("simple_labels").update(updates).eq("id", id);
+      if (error) {
+        setMsg({ type: "error", text: error.message });
+      } else {
+        setMsg({ type: "success", text: `Updated ${editing.name}` });
+        // update local state optimistically
+        setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...updates } : r)));
+        setEditing(null);
+      }
+    } catch (err) {
+      setMsg({ type: "error", text: err.message || "Failed to save" });
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -93,17 +143,20 @@ export default function ManageLabels() {
       <Stack gap="md">
         <Title order={2}>Manage Labels</Title>
 
-        <Group>
+        <Group position="apart">
           <TextInput
             leftSection={<IconSearch size={16} />}
             placeholder="Search by name, brand or batch..."
             value={search}
-            onChange={(e) => {
-              setSearch(e.currentTarget.value);
-              setPage(1);
-            }}
+            onChange={(e) => setSearch(e.currentTarget.value)}
             w={300}
           />
+          <Group>
+            <Button variant="light" onClick={loadData} disabled={loading}>
+              Refresh
+            </Button>
+            <Text size="sm">{rows.length ? `${rows.length} total` : ""}</Text>
+          </Group>
         </Group>
 
         {msg && (
@@ -115,7 +168,12 @@ export default function ManageLabels() {
           </Alert>
         )}
 
-        {loading && <Loader />}
+        {loading && (
+          <Group>
+            <Loader />
+            <Text>Loading all labels — this may take a moment for large tables...</Text>
+          </Group>
+        )}
 
         {!loading && (
           <Card withBorder radius="md">
@@ -169,7 +227,7 @@ export default function ManageLabels() {
 
             <Group justify="center" mt="md">
               <Pagination
-                total={Math.ceil(filtered.length / perPage)}
+                total={Math.max(1, Math.ceil(filtered.length / perPage))}
                 value={page}
                 onChange={setPage}
               />
