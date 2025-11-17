@@ -21,7 +21,9 @@ import { IconAlertTriangle, IconCheck, IconEdit, IconTrash, IconSearch } from "@
 import { supabase } from "../supabaseClient.js";
 
 export default function ManageLabels() {
+  // rows shown for current page
   const [rows, setRows] = useState([]);
+  // page-level filtered list (we'll keep the same name but it's page results)
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -29,112 +31,133 @@ export default function ManageLabels() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState(null);
 
-  // pagination (client-side)
+  // pagination
   const [page, setPage] = useState(1);
-  const perPage = 100;
-  const paginated = filtered.slice((page - 1) * perPage, page * perPage);
+  const perPage = 100; // you can change this
+  const [totalCount, setTotalCount] = useState(0);
 
-  // ---------- Load all labels (batching to overcome 1000-row PostgREST default) ----------
-  async function loadData() {
+  // derived slice for the table (we already load only current page so it's rows)
+  const paginated = filtered;
+
+  // debounce timer id for search
+  const [searchTimer, setSearchTimer] = useState(null);
+
+  // ---------- Load labels with server-side pagination and optional server-side search ----------
+  // pageNumber optional; q is search query
+  async function loadData(pageNumber = 1, q = "") {
     setLoading(true);
-    setMsg(null);
+    const from = (pageNumber - 1) * perPage;
+    const to = pageNumber * perPage - 1;
 
     try {
-      const batchSize = 1000; // Supabase/PostgREST default cap — fetch in chunks of 1000
-      let from = 0;
-      let all = [];
-      while (true) {
-        // request a batch
-        const { data, error } = await supabase
+      let query = supabase
+        .from("simple_labels")
+        .select("*", { count: "exact" })
+        .order("brand", { ascending: true })
+        .order("name", { ascending: true })
+        .range(from, to);
+
+      // if there's a search query, use .or with ilike for multiple columns
+      if (q && q.trim() !== "") {
+        // Sanitize and build pattern
+        const pattern = `%${q.trim().replace(/%/g, "\\%").replace(/_/g, "\\_")}%`;
+        // PostgREST-style OR: name.ilike.%...%,brand.ilike.%...%,batch_no.ilike.%...%
+        // Note: .or expects a comma-separated expression without surrounding parentheses
+        query = supabase
           .from("simple_labels")
-          .select("*")
-          // stable ordering across batches is important — include a unique indexed column like id
+          .select("*", { count: "exact" })
           .order("brand", { ascending: true })
           .order("name", { ascending: true })
-          .order("id", { ascending: true })
-          .range(from, from + batchSize - 1);
-
-        if (error) {
-          throw error;
-        }
-
-        if (!data || data.length === 0) {
-          break;
-        }
-
-        all = all.concat(data);
-        // if we received fewer than batchSize rows, that was the last batch
-        if (data.length < batchSize) {
-          break;
-        }
-        // otherwise prepare for next batch
-        from += batchSize;
+          .or(`name.ilike.${pattern},brand.ilike.${pattern},batch_no.ilike.${pattern}`)
+          .range(from, to);
       }
 
-      setRows(all);
-      setMsg({ type: "success", text: `Loaded ${all.length} labels` });
-    } catch (error) {
-      setMsg({ type: "error", text: error.message || "Failed to load data" });
+      const { data, error, count } = await query;
+
+      if (error) {
+        setMsg({ type: "error", text: error.message });
+        setRows([]);
+        setFiltered([]);
+        setTotalCount(0);
+      } else {
+        setRows(data || []);
+        setFiltered(data || []); // current page results
+        setTotalCount(count || 0);
+      }
+    } catch (err) {
+      setMsg({ type: "error", text: err.message || "Unknown error" });
       setRows([]);
+      setFiltered([]);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
   }
 
+  // initial load
   useEffect(() => {
-    loadData();
+    loadData(page, search);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ---------- Filter by search ----------
+  // reload whenever page changes (keep same search)
   useEffect(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) {
-      setFiltered(rows);
-    } else {
-      setFiltered(
-        rows.filter(
-          (r) =>
-            r.name?.toLowerCase().includes(q) ||
-            r.brand?.toLowerCase().includes(q) ||
-            r.batch_no?.toLowerCase().includes(q)
-        )
-      );
-    }
-    setPage(1);
-  }, [search, rows]);
+    loadData(page, search);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
+
+  // server-side search with debounce
+  useEffect(() => {
+    if (searchTimer) clearTimeout(searchTimer);
+    const t = setTimeout(() => {
+      // whenever user types, reset to page 1 and load with query
+      setPage(1);
+      loadData(1, search);
+    }, 300); // 300ms debounce
+    setSearchTimer(t);
+
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
 
   // ---------- Delete a label ----------
   async function handleDelete(row) {
     if (!window.confirm(`Delete label "${row.name}" (${row.style_code}) ?`)) return;
+    setLoading(true);
     const { error } = await supabase.from("simple_labels").delete().eq("id", row.id);
+    setLoading(false);
     if (error) setMsg({ type: "error", text: error.message });
     else {
       setMsg({ type: "success", text: `Deleted ${row.name}` });
-      // remove optimistically from state so UI updates fast
-      setRows((prev) => prev.filter((r) => r.id !== row.id));
+      // reload current page (if deletion made this page empty, keep same page number and let loadData handle it)
+      loadData(page, search);
     }
   }
 
-  // ---------- Save edits ----------
+  // ---------- Save edits (exclude use_by) ----------
   async function saveEdit() {
     if (!editing) return;
     setSaving(true);
-    const { id, ...updates } = editing;
-    try {
-      const { error } = await supabase.from("simple_labels").update(updates).eq("id", id);
-      if (error) {
-        setMsg({ type: "error", text: error.message });
-      } else {
-        setMsg({ type: "success", text: `Updated ${editing.name}` });
-        // update local state optimistically
-        setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...updates } : r)));
-        setEditing(null);
-      }
-    } catch (err) {
-      setMsg({ type: "error", text: err.message || "Failed to save" });
-    } finally {
+
+    // exclude use_by so frontend cannot update it directly
+    const { id, use_by, ...updates } = editing;
+
+    // Basic validation example (you can extend)
+    if (!updates.name || !updates.brand || !updates.batch_no) {
       setSaving(false);
+      setMsg({ type: "error", text: "Name, Brand and Batch No. are required" });
+      return;
+    }
+
+    const { error } = await supabase.from("simple_labels").update(updates).eq("id", id);
+
+    setSaving(false);
+    if (error) {
+      setMsg({ type: "error", text: error.message });
+    } else {
+      setMsg({ type: "success", text: `Updated ${editing.name}` });
+      setEditing(null);
+      loadData(page, search);
     }
   }
 
@@ -143,20 +166,16 @@ export default function ManageLabels() {
       <Stack gap="md">
         <Title order={2}>Manage Labels</Title>
 
-        <Group position="apart">
+        <Group>
           <TextInput
             leftSection={<IconSearch size={16} />}
             placeholder="Search by name, brand or batch..."
             value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
+            onChange={(e) => {
+              setSearch(e.currentTarget.value);
+            }}
             w={300}
           />
-          <Group>
-            <Button variant="light" onClick={loadData} disabled={loading}>
-              Refresh
-            </Button>
-            <Text size="sm">{rows.length ? `${rows.length} total` : ""}</Text>
-          </Group>
         </Group>
 
         {msg && (
@@ -168,12 +187,7 @@ export default function ManageLabels() {
           </Alert>
         )}
 
-        {loading && (
-          <Group>
-            <Loader />
-            <Text>Loading all labels — this may take a moment for large tables...</Text>
-          </Group>
-        )}
+        {loading && <Loader />}
 
         {!loading && (
           <Card withBorder radius="md">
@@ -222,21 +236,28 @@ export default function ManageLabels() {
                     </Table.Td>
                   </Table.Tr>
                 ))}
+                {paginated.length === 0 && (
+                  <Table.Tr>
+                    <Table.Td colSpan={7}>
+                      <Text align="center">No rows on this page.</Text>
+                    </Table.Td>
+                  </Table.Tr>
+                )}
               </Table.Tbody>
             </Table>
 
             <Group justify="center" mt="md">
               <Pagination
-                total={Math.max(1, Math.ceil(filtered.length / perPage))}
+                total={Math.max(1, Math.ceil(totalCount / perPage))}
                 value={page}
-                onChange={setPage}
+                onChange={(p) => setPage(p)}
               />
             </Group>
           </Card>
         )}
       </Stack>
 
-      {/* ---------- Edit Modal ---------- */}
+      {/* ---------- Edit Modal (no editable use_by) ---------- */}
       <Modal
         opened={!!editing}
         onClose={() => setEditing(null)}
@@ -327,6 +348,14 @@ export default function ManageLabels() {
                 onChange={(v) => setEditing({ ...editing, protein: v })}
               />
             </Group>
+
+            {/* show use_by read-only since it's auto-managed by your DB */}
+            <Text size="sm">
+              Use-by:{" "}
+              {editing.use_by
+                ? new Date(editing.use_by).toLocaleDateString()
+                : "— (managed automatically)"}
+            </Text>
 
             <Group justify="flex-end" mt="md">
               <Button variant="light" color="gray" onClick={() => setEditing(null)}>
