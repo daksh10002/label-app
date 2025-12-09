@@ -37,6 +37,7 @@ export default function TrinetraPage() {
         .from("simple_labels")
         .select("*")
         .eq("brand", "Trinetra")
+        .eq("is_active", true)
         .order("name", { ascending: true });
       if (!error) {
         setRows(data || []);

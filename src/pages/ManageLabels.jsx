@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Alert,
+  Badge,
   Button,
   Card,
   Container,
@@ -11,13 +12,14 @@ import {
   Pagination,
   Select,
   Stack,
+  Switch,
   Table,
   Text,
   TextInput,
   Textarea,
   Title,
 } from "@mantine/core";
-import { IconAlertTriangle, IconCheck, IconEdit, IconTrash, IconSearch } from "@tabler/icons-react";
+import { IconAlertTriangle, IconCheck, IconEdit, IconTrash, IconSearch, IconToggleLeft, IconToggleRight } from "@tabler/icons-react";
 import { supabase } from "../supabaseClient.js";
 
 export default function ManageLabels() {
@@ -134,6 +136,25 @@ export default function ManageLabels() {
     }
   }
 
+  // ---------- Toggle active/inactive status ----------
+  async function handleToggleActive(row) {
+    setLoading(true);
+    const newStatus = !row.is_active;
+    const { error } = await supabase
+      .from("simple_labels")
+      .update({ is_active: newStatus })
+      .eq("id", row.id);
+    setLoading(false);
+    if (error) setMsg({ type: "error", text: error.message });
+    else {
+      setMsg({
+        type: "success",
+        text: `${row.name} marked as ${newStatus ? "active" : "inactive"}`
+      });
+      loadData(page, search);
+    }
+  }
+
   // ---------- Save edits (exclude use_by) ----------
   async function saveEdit() {
     if (!editing) return;
@@ -200,12 +221,13 @@ export default function ManageLabels() {
                   <Table.Th>Weight</Table.Th>
                   <Table.Th>MRP</Table.Th>
                   <Table.Th>Style</Table.Th>
+                  <Table.Th>Status</Table.Th>
                   <Table.Th></Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {paginated.map((r) => (
-                  <Table.Tr key={r.id}>
+                  <Table.Tr key={r.id} style={{ opacity: r.is_active ? 1 : 0.6 }}>
                     <Table.Td>{r.name}</Table.Td>
                     <Table.Td>{r.brand}</Table.Td>
                     <Table.Td>{r.batch_no}</Table.Td>
@@ -213,7 +235,21 @@ export default function ManageLabels() {
                     <Table.Td>{r.mrp}</Table.Td>
                     <Table.Td>{r.style_code}</Table.Td>
                     <Table.Td>
+                      <Badge color={r.is_active ? "green" : "gray"} variant="light">
+                        {r.is_active ? "Active" : "Inactive"}
+                      </Badge>
+                    </Table.Td>
+                    <Table.Td>
                       <Group gap="xs">
+                        <Button
+                          variant="light"
+                          color={r.is_active ? "orange" : "green"}
+                          size="xs"
+                          leftSection={r.is_active ? <IconToggleLeft size={14} /> : <IconToggleRight size={14} />}
+                          onClick={() => handleToggleActive(r)}
+                        >
+                          {r.is_active ? "Deactivate" : "Activate"}
+                        </Button>
                         <Button
                           variant="light"
                           color="blue"
@@ -238,7 +274,7 @@ export default function ManageLabels() {
                 ))}
                 {paginated.length === 0 && (
                   <Table.Tr>
-                    <Table.Td colSpan={7}>
+                    <Table.Td colSpan={8}>
                       <Text align="center">No rows on this page.</Text>
                     </Table.Td>
                   </Table.Tr>
@@ -348,6 +384,14 @@ export default function ManageLabels() {
                 onChange={(v) => setEditing({ ...editing, protein: v })}
               />
             </Group>
+
+            {/* Active/Inactive Switch */}
+            <Switch
+              label="Active"
+              description="Inactive labels won't appear in printing dropdowns"
+              checked={editing.is_active ?? true}
+              onChange={(e) => setEditing({ ...editing, is_active: e.currentTarget.checked })}
+            />
 
             {/* show use_by read-only since it's auto-managed by your DB */}
             <Text size="sm">

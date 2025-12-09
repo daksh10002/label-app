@@ -36,6 +36,7 @@ export default function JarPage() {
         .from("simple_labels")
         .select("*")
         .eq("style_code", "38x25mm")
+        .eq("is_active", true)
         .order("brand", { ascending: true })
         .order("name", { ascending: true });
       if (!error) {

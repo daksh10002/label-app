@@ -50,6 +50,7 @@ export async function loadBrandSimple(brand) {
     `
     )
     .eq("brand", brand)
+    .eq("is_active", true)
     .order("name", { ascending: true });
 
   if (error) throw error;

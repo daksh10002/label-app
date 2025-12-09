@@ -36,6 +36,7 @@ export default function GroshaatPage() {
         .select("*")
         .eq("brand", "Groshaat")
         .eq("style_code", "3x4in")
+        .eq("is_active", true)
         .order("name", { ascending: true });
 
       if (!error) {

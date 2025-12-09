@@ -33,6 +33,7 @@ export default function GoshudhPage() {
         .from("simple_labels")
         .select("*")
         .eq("brand", "Goshudh")
+        .eq("is_active", true)
         .in("style_code", ["2x4in", "3x4in"])
         .order("name", { ascending: true });
 

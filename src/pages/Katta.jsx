@@ -37,6 +37,7 @@ export default function KattaPage() {
         .from("simple_labels")
         .select("*")
         .eq("style_code", "38x24mm")
+        .eq("is_active", true)
         .order("brand", { ascending: true })
         .order("name", { ascending: true });
 
