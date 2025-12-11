@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 
-export default function AppShell(){
+export default function AppShell() {
   return (
     <div>
       {/* Top bar */}
@@ -10,6 +10,7 @@ export default function AppShell(){
           <nav className="ml-auto flex gap-2">
             <Nav to="/">Home</Nav>
             <Nav to="/goshudh">Goshudh</Nav>
+            <Nav to="/goshudh-combo">Combo</Nav>
             <Nav to="/trinetra">Trinetra</Nav>
             <Nav to="/groshaat">Groshaat</Nav>
             <Nav to="/jar">Jar</Nav>
@@ -18,17 +19,17 @@ export default function AppShell(){
       </div>
       {/* Page body */}
       <div className="mx-auto max-w-6xl px-4 py-4">
-        <Outlet/>
+        <Outlet />
       </div>
     </div>
   );
 }
 
-function Nav({to, children}){
+function Nav({ to, children }) {
   return (
     <NavLink
       to={to}
-      className={({isActive}) =>
+      className={({ isActive }) =>
         `px-3 py-1.5 rounded-xl border ${isActive ? "border-slate-500 bg-slate-900" : "border-border hover:bg-slate-900"}`
       }
       end

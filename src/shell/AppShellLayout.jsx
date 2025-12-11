@@ -66,6 +66,13 @@ export default function AppShellLayout() {
           />
           <NavLink
             component={Link}
+            to="/goshudh-combo"
+            label="Goshudh Combo"
+            active={pathname.startsWith("/goshudh-combo")}
+            styles={{ label: { color: "black" } }}
+          />
+          <NavLink
+            component={Link}
             to="/trinetra"
             label="Trinetra"
             active={pathname.startsWith("/trinetra")}
@@ -73,9 +80,23 @@ export default function AppShellLayout() {
           />
           <NavLink
             component={Link}
+            to="/trinetra-combo"
+            label="Trinetra Combo"
+            active={pathname.startsWith("/trinetra-combo")}
+            styles={{ label: { color: "black" } }}
+          />
+          <NavLink
+            component={Link}
             to="/groshaat"
             label="Groshaat"
             active={pathname.startsWith("/groshaat")}
+            styles={{ label: { color: "black" } }}
+          />
+          <NavLink
+            component={Link}
+            to="/groshaat-combo"
+            label="Groshaat Combo"
+            active={pathname.startsWith("/groshaat-combo")}
             styles={{ label: { color: "black" } }}
           />
 

@@ -13,14 +13,16 @@ import {
   Select,
   Stack,
   Switch,
+  FileInput,
   Table,
   Text,
   TextInput,
   Textarea,
   Title,
 } from "@mantine/core";
-import { IconAlertTriangle, IconCheck, IconEdit, IconTrash, IconSearch, IconToggleLeft, IconToggleRight } from "@tabler/icons-react";
+import { IconAlertTriangle, IconCheck, IconEdit, IconTrash, IconSearch, IconToggleLeft, IconToggleRight, IconDownload, IconUpload, IconFileSpreadsheet } from "@tabler/icons-react";
 import { supabase } from "../supabaseClient.js";
+import Papa from "papaparse";
 
 export default function ManageLabels() {
   // rows shown for current page
@@ -31,7 +33,16 @@ export default function ManageLabels() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
+
   const [msg, setMsg] = useState(null);
+
+  // Bulk Import State
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [importFile, setImportFile] = useState(null);
+  const [importPreview, setImportPreview] = useState([]);
+  const [importErrors, setImportErrors] = useState([]);
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState(null);
 
   // pagination
   const [page, setPage] = useState(1);
@@ -182,12 +193,174 @@ export default function ManageLabels() {
     }
   }
 
+  // ---------- Bulk Export (CSV) ----------
+  async function handleExportCsv() {
+    setLoading(true);
+    // Fetch ALL rows (or filtered if you prefer, but usually bulk export implies all or large set)
+    // We'll respect the search filter if present, but fetch all pages
+    let query = supabase
+      .from("simple_labels")
+      .select("*")
+      .order("brand", { ascending: true })
+      .order("name", { ascending: true });
+
+    if (search && search.trim() !== "") {
+      const pattern = `%${search.trim().replace(/%/g, "\\%").replace(/_/g, "\\_")}%`;
+      query = query.or(`name.ilike.${pattern},brand.ilike.${pattern},batch_no.ilike.${pattern}`);
+    }
+
+    const { data, error } = await query;
+    setLoading(false);
+
+    if (error) {
+      setMsg({ type: "error", text: "Export failed: " + error.message });
+      return;
+    }
+
+    if (!data || !data.length) {
+      setMsg({ type: "info", text: "No rows to export." });
+      return;
+    }
+
+    // Convert to CSV
+    // We explicitly order columns so ID is first
+    const csv = Papa.unparse(data, {
+      columns: [
+        "id",
+        "name",
+        "brand",
+        "batch_no",
+        "mrp",
+        "net_weight_g",
+        "shelf_life_months",
+        "style_code",
+        "is_active",
+        "ingredients",
+        "calories",
+        "carbohydrates",
+        "fats",
+        "protein",
+        "cholesterol",
+        "use_by", // read-only usually, but good for reference
+        "pkd_on"
+      ],
+    });
+
+    // Valid filename
+    const filename = `simple_labels_export_${new Date().toISOString().slice(0, 10)}.csv`;
+
+    // Trigger download
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  // ---------- Bulk Import Logic ----------
+  function handleFileChange(file) {
+    setImportFile(file);
+    setImportPreview([]);
+    setImportErrors([]);
+    setImportMsg(null);
+
+    if (!file) return;
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        const rows = results.data;
+        if (!rows || !rows.length) {
+          setImportErrors(["CSV file is empty or invalid."]);
+          return;
+        }
+
+        // Validate & Sanitize
+        // We need to handle boolean conversion for is_active
+        const saneRows = [];
+        const errs = [];
+
+        rows.forEach((r, idx) => {
+          // Normalize is_active
+          let isActive = true; // default
+          if (r.is_active !== undefined && r.is_active !== null && r.is_active !== "") {
+            const low = String(r.is_active).toLowerCase();
+            if (low === "false" || low === "0" || low === "no") isActive = false;
+          }
+
+          // We pass ID if present (update), else undefined (insert)
+          const id = r.id && r.id.trim() !== "" ? r.id.trim() : undefined;
+
+          // Simple required check
+          if (!r.name) {
+            errs.push(`Row ${idx + 2}: Name is missing`); // idx+2 because header is 1
+          }
+
+          saneRows.push({
+            ...(id ? { id } : {}), // only include ID if it exists
+            name: r.name,
+            brand: r.brand,
+            batch_no: r.batch_no,
+            net_weight_g: r.net_weight_g || null,
+            mrp: r.mrp || null,
+            shelf_life_months: r.shelf_life_months || 6,
+            style_code: r.style_code,
+            is_active: isActive,
+            ingredients: r.ingredients,
+            calories: r.calories,
+            carbohydrates: r.carbohydrates,
+            fats: r.fats,
+            protein: r.protein,
+            cholesterol: r.cholesterol
+          });
+        });
+
+        if (errs.length > 0) {
+          setImportErrors(errs);
+          // We might still allow upload of valid rows, but usually safer to block
+        }
+        setImportPreview(saneRows);
+      },
+      error: (err) => {
+        setImportErrors([`Parse Error: ${err.message}`]);
+      }
+    });
+  }
+
+  async function handleBulkUpsert() {
+    if (!importPreview.length) return;
+    setImporting(true);
+    setImportMsg(null);
+
+    // Upsert (update if conflict on ID, or insert if no ID)
+    // Note: Supabase upsert matches on PRIMARY KEY (id) by default.
+    const { data, error } = await supabase.from("simple_labels").upsert(importPreview, { onConflict: "id" });
+
+    setImporting(false);
+    if (error) {
+      setImportMsg({ type: "error", text: error.message });
+    } else {
+      setImportMsg({ type: "success", text: `Successfully processed ${importPreview.length} rows.` });
+      // Close modal after short delay or let user close
+      setTimeout(() => {
+        setImportModalOpen(false);
+        setImportFile(null);
+        setImportPreview([]);
+        loadData(page, search); // refresh table
+      }, 1500);
+    }
+  }
+
   return (
     <Container size="xl" py="md">
       <Stack gap="md">
         <Title order={2}>Manage Labels</Title>
 
-        <Group>
+        <Group justify="space-between">
           <TextInput
             leftSection={<IconSearch size={16} />}
             placeholder="Search by name, brand or batch..."
@@ -197,6 +370,22 @@ export default function ManageLabels() {
             }}
             w={300}
           />
+          <Group>
+            <Button
+              variant="outline"
+              leftSection={<IconDownload size={16} />}
+              onClick={handleExportCsv}
+              loading={loading}
+            >
+              Export CSV
+            </Button>
+            <Button
+              leftSection={<IconFileSpreadsheet size={16} />}
+              onClick={() => setImportModalOpen(true)}
+            >
+              Bulk Update
+            </Button>
+          </Group>
         </Group>
 
         {msg && (
@@ -412,6 +601,71 @@ export default function ManageLabels() {
           </Stack>
         )}
       </Modal>
+      {/* ---------- Bulk Import Modal ---------- */}
+      <Modal
+        opened={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        title="Bulk Update / Import via CSV"
+        size="lg"
+        centered
+      >
+        <Stack>
+          <Text size="sm" c="dimmed">
+            Upload a CSV to update existing labels (by ID) or insert new ones.
+            <br />
+            <strong>Tip:</strong> Use "Export CSV" first to get a template with valid IDs.
+          </Text>
+
+          <FileInput
+            label="Upload CSV"
+            placeholder="Select file..."
+            accept=".csv"
+            value={importFile}
+            onChange={handleFileChange}
+            leftSection={<IconUpload size={16} />}
+          />
+
+          {importErrors.length > 0 && (
+            <Alert color="red" title="Validation Errors" icon={<IconAlertTriangle />}>
+              <Stack gap={4}>
+                {importErrors.slice(0, 5).map((e, i) => (
+                  <Text key={i} size="xs">{e}</Text>
+                ))}
+                {importErrors.length > 5 && <Text size="xs">...and {importErrors.length - 5} more</Text>}
+              </Stack>
+            </Alert>
+          )}
+
+          {importPreview.length > 0 && !importErrors.length && (
+            <Alert color="blue" icon={<IconFileSpreadsheet />}>
+              Ready to process <strong>{importPreview.length}</strong> rows.
+              {importPreview.some(r => !!r.id) && (
+                <Text size="xs" mt={4}>
+                  rows with ID will be updated; others inserted.
+                </Text>
+              )}
+            </Alert>
+          )}
+
+          {importMsg && (
+            <Alert color={importMsg.type === "success" ? "green" : "red"}>
+              {importMsg.text}
+            </Alert>
+          )}
+
+          <Group justify="flex-end" mt="md">
+            <Button variant="subtle" onClick={() => setImportModalOpen(false)}>Cancel</Button>
+            <Button
+              onClick={handleBulkUpsert}
+              loading={importing}
+              disabled={!importPreview.length || importErrors.length > 0}
+            >
+              Start Import
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
     </Container>
   );
 }
