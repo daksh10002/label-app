@@ -64,13 +64,7 @@ export default function AppShellLayout() {
             active={pathname.startsWith("/goshudh")}
             styles={{ label: { color: "black" } }}
           />
-          <NavLink
-            component={Link}
-            to="/goshudh-combo"
-            label="Goshudh Combo"
-            active={pathname.startsWith("/goshudh-combo")}
-            styles={{ label: { color: "black" } }}
-          />
+          
           <NavLink
             component={Link}
             to="/trinetra"
@@ -78,13 +72,7 @@ export default function AppShellLayout() {
             active={pathname.startsWith("/trinetra")}
             styles={{ label: { color: "black" } }}
           />
-          <NavLink
-            component={Link}
-            to="/trinetra-combo"
-            label="Trinetra Combo"
-            active={pathname.startsWith("/trinetra-combo")}
-            styles={{ label: { color: "black" } }}
-          />
+      
           <NavLink
             component={Link}
             to="/groshaat"
@@ -92,13 +80,7 @@ export default function AppShellLayout() {
             active={pathname.startsWith("/groshaat")}
             styles={{ label: { color: "black" } }}
           />
-          <NavLink
-            component={Link}
-            to="/groshaat-combo"
-            label="Groshaat Combo"
-            active={pathname.startsWith("/groshaat-combo")}
-            styles={{ label: { color: "black" } }}
-          />
+         
 
           {/* Collapsible group for smaller sticker sizes */}
           <NavLink

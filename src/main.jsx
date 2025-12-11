@@ -11,11 +11,8 @@ import AppShellLayout from "./shell/AppShellLayout.jsx";
 // 🏷️ Pages
 import Home from "./pages/Home.jsx";
 import GoshudhPage from "./pages/Goshudh.jsx";
-import GoshudhComboPage from "./pages/GoshudhCombo.jsx";
 import TrinetraPage from "./pages/Trinetra.jsx";
-import TrinetraComboPage from "./pages/TrinetraCombo.jsx";
 import GroshaatPage from "./pages/Groshaat.jsx";
-import GroshaatComboPage from "./pages/GroshaatCombo.jsx";
 import JarPage from "./pages/Jar.jsx";
 import KattaPage from "./pages/Katta.jsx";
 import UploadLabels from "./pages/UploadLabels.jsx";
@@ -29,11 +26,8 @@ const router = createHashRouter([
     children: [
       { index: true, element: <Home /> },
       { path: "goshudh", element: <GoshudhPage /> },
-      { path: "goshudh-combo", element: <GoshudhComboPage /> },
       { path: "trinetra", element: <TrinetraPage /> },
-      { path: "trinetra-combo", element: <TrinetraComboPage /> },
       { path: "groshaat", element: <GroshaatPage /> },
-      { path: "groshaat-combo", element: <GroshaatComboPage /> },
       { path: "jar", element: <JarPage /> },
       { path: "katta", element: <KattaPage /> },
       { path: "upload", element: <UploadLabels /> },

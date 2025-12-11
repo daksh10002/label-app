@@ -10,7 +10,6 @@ export default function AppShell() {
           <nav className="ml-auto flex gap-2">
             <Nav to="/">Home</Nav>
             <Nav to="/goshudh">Goshudh</Nav>
-            <Nav to="/goshudh-combo">Combo</Nav>
             <Nav to="/trinetra">Trinetra</Nav>
             <Nav to="/groshaat">Groshaat</Nav>
             <Nav to="/jar">Jar</Nav>
