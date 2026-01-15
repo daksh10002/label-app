@@ -27,7 +27,7 @@ import { supabase } from "../supabaseClient.js";
 // --- CONFIG YOU CAN TWEAK ---
 const ALLOWED_BRANDS = ["Goshudh", "Trinetra", "Groshaat"];
 // The style_code values your app uses
-const ALLOWED_STYLE_CODES = ["2x4in", "3x4in", "38x25mm","38x24mm"];
+const ALLOWED_STYLE_CODES = ["2x4in", "3x4in", "38x25mm", "38x24mm"];
 
 // Columns we accept for CSV bulk upload (order not required, header names must match)
 const CSV_COLUMNS = [
@@ -130,6 +130,7 @@ export default function UploadLabels() {
   const [sLife, setSLife] = useState(6);
   const [sStyle, setSStyle] = useState(null);
   const [sIngr, setSIngr] = useState("");
+  // Nutritional fields (NumberInputs now)
   const [sCal, setSCal] = useState("");
   const [sCarb, setSCarb] = useState("");
   const [sFat, setSFat] = useState("");
@@ -181,11 +182,13 @@ export default function UploadLabels() {
         shelf_life_months: sLife,
         style_code: sStyle,
         ingredients: sIngr,
-        calories: sCal,
-        carbohydrates: sCarb,
-        fats: sFat,
-        protein: sProt,
-        cholesterol: sChol,
+
+        // Append units if values exist (check for empty string to allow 0)
+        calories: sCal !== "" ? `${sCal} Kcal` : null,
+        carbohydrates: sCarb !== "" ? `${sCarb} g` : null,
+        fats: sFat !== "" ? `${sFat} g` : null,
+        protein: sProt !== "" ? `${sProt} g` : null,
+        cholesterol: sChol !== "" ? `${sChol} g` : null,
       },
       null
     );
@@ -269,7 +272,7 @@ export default function UploadLabels() {
       <Stack gap="md">
         <Title order={2}>Upload Labels</Title>
         <Text c="dimmed">
-          Insert records into <Badge color="blue" variant="light">simple_labels</Badge>.  
+          Insert records into <Badge color="blue" variant="light">simple_labels</Badge>.
           Use <strong>Single</strong> for quick entries, or <strong>Bulk</strong> to import a CSV with preview + validation.
         </Text>
 
@@ -363,11 +366,43 @@ export default function UploadLabels() {
                 />
 
                 <Group grow>
-                  <TextInput label="Calories" value={sCal} onChange={(e) => setSCal(e.currentTarget.value)} />
-                  <TextInput label="Carbohydrates" value={sCarb} onChange={(e) => setSCarb(e.currentTarget.value)} />
-                  <TextInput label="Fats" value={sFat} onChange={(e) => setSFat(e.currentTarget.value)} />
-                  <TextInput label="Protein" value={sProt} onChange={(e) => setSProt(e.currentTarget.value)} />
-                  <TextInput label="Cholesterol" value={sChol} onChange={(e) => setSChol(e.currentTarget.value)} />
+                  <NumberInput
+                    label="Calories (Kcal)"
+                    placeholder="e.g. 100"
+                    value={sCal}
+                    onChange={setSCal}
+                    min={0}
+                  />
+                  <NumberInput
+                    label="Carbohydrates (g)"
+                    placeholder="e.g. 20"
+                    value={sCarb}
+                    onChange={setSCarb}
+                    min={0}
+                  />
+                </Group>
+                <Group grow>
+                  <NumberInput
+                    label="Fats (g)"
+                    placeholder="e.g. 5"
+                    value={sFat}
+                    onChange={setSFat}
+                    min={0}
+                  />
+                  <NumberInput
+                    label="Protein (g)"
+                    placeholder="e.g. 10"
+                    value={sProt}
+                    onChange={setSProt}
+                    min={0}
+                  />
+                  <NumberInput
+                    label="Cholesterol (g)"
+                    placeholder="e.g. 0"
+                    value={sChol}
+                    onChange={setSChol}
+                    min={0}
+                  />
                 </Group>
 
                 {singleMsg && (
