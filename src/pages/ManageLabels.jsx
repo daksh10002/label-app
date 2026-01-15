@@ -102,6 +102,14 @@ export default function ManageLabels() {
     return `%${safe}%`;
   }, []);
 
+  // helper: extract number from "100 Kcal" or "10 g"
+  const parseUnitValue = (val) => {
+    if (!val) return "";
+    // match number at start
+    const match = String(val).match(/^(\d+(\.\d+)?)/);
+    return match ? Number(match[1]) : "";
+  };
+
   // --- Load page (server-side pagination + optional search) ---
   const loadPage = useCallback(
     async (pageNumber = 1, q = "") => {
@@ -214,6 +222,13 @@ export default function ManageLabels() {
     // exclude use_by
     const { id, use_by, ...updates } = editing;
 
+    // Re-append units for nutritional fields
+    if (updates.calories !== undefined && updates.calories !== "") updates.calories = `${updates.calories} Kcal`;
+    if (updates.carbohydrates !== undefined && updates.carbohydrates !== "") updates.carbohydrates = `${updates.carbohydrates} g`;
+    if (updates.fats !== undefined && updates.fats !== "") updates.fats = `${updates.fats} g`;
+    if (updates.protein !== undefined && updates.protein !== "") updates.protein = `${updates.protein} g`;
+    if (updates.cholesterol !== undefined && updates.cholesterol !== "") updates.cholesterol = `${updates.cholesterol} g`;
+
     if (!updates.name || !updates.brand || !updates.batch_no) {
       setSaving(false);
       setMsg({ type: "error", text: "Name, Brand and Batch No. are required" });
@@ -229,6 +244,18 @@ export default function ManageLabels() {
       loadPage(page, search);
     }
   }, [editing, page, search, loadPage]);
+
+  const handleEditClick = (r) => {
+    // Parse nutritional strings into numbers for the form
+    setEditing({
+      ...r,
+      calories: parseUnitValue(r.calories),
+      carbohydrates: parseUnitValue(r.carbohydrates),
+      fats: parseUnitValue(r.fats),
+      protein: parseUnitValue(r.protein),
+      cholesterol: parseUnitValue(r.cholesterol),
+    });
+  };
 
   // ---------- Batch Export (fetch all rows in batches) ----------
   const handleExportCsv = useCallback(async () => {
@@ -633,7 +660,7 @@ export default function ManageLabels() {
                         <Button variant="light" color={r.is_active ? "orange" : "green"} size="xs" leftSection={r.is_active ? <IconToggleLeft size={14} /> : <IconToggleRight size={14} />} onClick={() => handleToggleActive(r)}>
                           {r.is_active ? "Deactivate" : "Activate"}
                         </Button>
-                        <Button variant="light" color="blue" size="xs" leftSection={<IconEdit size={14} />} onClick={() => setEditing({ ...r })}>Edit</Button>
+                        <Button variant="light" color="blue" size="xs" leftSection={<IconEdit size={14} />} onClick={() => handleEditClick(r)}>Edit</Button>
                         <Button variant="light" color="red" size="xs" leftSection={<IconTrash size={14} />} onClick={() => handleDelete(r)}>Delete</Button>
                       </Group>
                     </Table.Td>
@@ -669,12 +696,13 @@ export default function ManageLabels() {
             <Select label="Style Code *" placeholder="Select size" value={editing.style_code} onChange={(v) => setEditing({ ...editing, style_code: v })} data={["2x4in", "3x4in", "38x25mm", "38x24mm"]} required />
             <Textarea label="Ingredients" placeholder="Comma/space separated or uppercase words" value={editing.ingredients || ""} onChange={(e) => setEditing({ ...editing, ingredients: e.currentTarget.value })} autosize minRows={2} />
             <Group grow>
-              <NumberInput label="Calories" value={editing.calories || ""} onChange={(v) => setEditing({ ...editing, calories: v })} />
-              <NumberInput label="Carbohydrates" value={editing.carbohydrates || ""} onChange={(v) => setEditing({ ...editing, carbohydrates: v })} />
+              <NumberInput label="Calories (Kcal)" value={editing.calories} onChange={(v) => setEditing({ ...editing, calories: v })} min={0} />
+              <NumberInput label="Carbohydrates (g)" value={editing.carbohydrates} onChange={(v) => setEditing({ ...editing, carbohydrates: v })} min={0} />
             </Group>
             <Group grow>
-              <NumberInput label="Fats" value={editing.fats || ""} onChange={(v) => setEditing({ ...editing, fats: v })} />
-              <NumberInput label="Protein" value={editing.protein || ""} onChange={(v) => setEditing({ ...editing, protein: v })} />
+              <NumberInput label="Fats (g)" value={editing.fats} onChange={(v) => setEditing({ ...editing, fats: v })} min={0} />
+              <NumberInput label="Protein (g)" value={editing.protein} onChange={(v) => setEditing({ ...editing, protein: v })} min={0} />
+              <NumberInput label="Cholesterol (g)" value={editing.cholesterol} onChange={(v) => setEditing({ ...editing, cholesterol: v })} min={0} />
             </Group>
 
             <Switch label="Active" description="Inactive labels won't appear in printing dropdowns" checked={editing.is_active ?? true} onChange={(e) => setEditing({ ...editing, is_active: e.currentTarget.checked })} />
