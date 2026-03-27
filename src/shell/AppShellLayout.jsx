@@ -105,6 +105,14 @@ export default function AppShellLayout() {
             />
           </NavLink>
 
+          <NavLink
+            component={Link}
+            to="/new-labels"
+            label="New Labels (3x4)"
+            active={pathname.startsWith("/new-labels")}
+            styles={{ label: { color: "black", fontWeight: 700 } }}
+          />
+
           {/* Upload Labels */}
           <NavLink
             component={Link}
