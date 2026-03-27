@@ -693,7 +693,7 @@ export default function ManageLabels() {
             <NumberInput label="MRP (₹)" placeholder="e.g., 199" value={editing.mrp || ""} onChange={(v) => setEditing({ ...editing, mrp: v })} />
             <NumberInput label="Net Weight (g) *" placeholder="e.g., 250" value={editing.net_weight_g || ""} onChange={(v) => setEditing({ ...editing, net_weight_g: v })} required />
             <NumberInput label="Shelf Life (months) *" placeholder="6" value={editing.shelf_life_months || ""} onChange={(v) => setEditing({ ...editing, shelf_life_months: v })} required />
-            <Select label="Style Code *" placeholder="Select size" value={editing.style_code} onChange={(v) => setEditing({ ...editing, style_code: v })} data={["2x4in", "3x4in", "38x25mm", "38x24mm"]} required />
+            <Select label="Style Code *" placeholder="Select size" value={editing.style_code} onChange={(v) => setEditing({ ...editing, style_code: v })} data={["2x4in", "3x4in", "3x4in_new", "38x25mm", "38x24mm"]} required />
             <Textarea label="Ingredients" placeholder="Comma/space separated or uppercase words" value={editing.ingredients || ""} onChange={(e) => setEditing({ ...editing, ingredients: e.currentTarget.value })} autosize minRows={2} />
             <Group grow>
               <NumberInput label="Calories (Kcal)" value={editing.calories} onChange={(v) => setEditing({ ...editing, calories: v })} min={0} />
