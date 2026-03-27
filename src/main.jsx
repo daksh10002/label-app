@@ -15,6 +15,7 @@ import TrinetraPage from "./pages/Trinetra.jsx";
 import GroshaatPage from "./pages/Groshaat.jsx";
 import JarPage from "./pages/Jar.jsx";
 import KattaPage from "./pages/Katta.jsx";
+import NewLabelsPage from "./pages/NewLabels.jsx";
 import UploadLabels from "./pages/UploadLabels.jsx";
 import ManageLabels from "./pages/ManageLabels.jsx";
 
@@ -30,6 +31,7 @@ const router = createHashRouter([
       { path: "groshaat", element: <GroshaatPage /> },
       { path: "jar", element: <JarPage /> },
       { path: "katta", element: <KattaPage /> },
+      { path: "new-labels", element: <NewLabelsPage /> },
       { path: "upload", element: <UploadLabels /> },
       { path: "manage", element: <ManageLabels /> },
     ],
