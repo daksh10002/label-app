@@ -27,7 +27,7 @@ import { supabase } from "../supabaseClient.js";
 // --- CONFIG YOU CAN TWEAK ---
 const ALLOWED_BRANDS = ["Goshudh", "Trinetra", "Groshaat"];
 // The style_code values your app uses
-const ALLOWED_STYLE_CODES = ["2x4in", "3x4in", "38x25mm", "38x24mm"];
+const ALLOWED_STYLE_CODES = ["2x4in", "3x4in", "3x4in_new", "38x25mm", "38x24mm"];
 
 // Columns we accept for CSV bulk upload (order not required, header names must match)
 const CSV_COLUMNS = [
@@ -157,7 +157,7 @@ export default function UploadLabels() {
       mrp: 199,
       net_weight_g: 250,
       shelf_life_months: 6,
-      style_code: "3x4in",
+      style_code: "3x4in_new",
       ingredients: "PEARL MILLET PORRIDGE",
       calories: "—",
       carbohydrates: "—",
