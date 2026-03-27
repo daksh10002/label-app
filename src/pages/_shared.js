@@ -14,10 +14,12 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // Templates (make sure these files/exports exist)
 import { Label_2x4_Goshudh } from "../templates/Label_2x4_Goshudh.jsx";
 import { Label_3x4_Goshudh } from "../templates/Label_3x4_Goshudh.jsx";
+import { Label_3x4_New } from "../templates/Label_3x4_New.jsx";
 
 /* ---------- STYLE CONSTANTS (inches) ---------- */
 export const STYLE_2X4 = { style_code: "2x4in", width_in: 4, height_in: 2 };
 export const STYLE_3X4 = { style_code: "3x4in", width_in: 4, height_in: 3 };
+export const STYLE_3X4_NEW = { style_code: "3x4in_new", width_in: 4, height_in: 3 };
 
 // exact-size panel style for preview/export container
 export function exactPanelStyle(style) {
@@ -72,6 +74,10 @@ export function pickTemplate(row) {
     return { Component: Label_3x4_Goshudh, style: STYLE_3X4, style_code: "3x4in" };
   }
 
+  if (code === "3x4in_new") {
+    return { Component: Label_3x4_New, style: STYLE_3X4_NEW, style_code: "3x4in_new" };
+  }
+
   // default / fallback
   return { Component: Label_2x4_Goshudh, style: STYLE_2X4, style_code: "2x4in" };
 }
@@ -112,12 +118,14 @@ export function decideStyleCode(input) {
   // If a row object was passed
   if (input && typeof input === "object" && input.style_code) {
     const c = String(input.style_code).toLowerCase();
+    if (c.includes("3x4in_new")) return "3x4in_new";
     if (c.includes("3x4")) return "3x4in";
     if (c.includes("2x4")) return "2x4in";
   }
   // If a raw string code was passed
   if (typeof input === "string") {
     const c = input.toLowerCase();
+    if (c.includes("3x4in_new")) return "3x4in_new";
     if (c.includes("3x4")) return "3x4in";
     if (c.includes("2x4")) return "2x4in";
   }
