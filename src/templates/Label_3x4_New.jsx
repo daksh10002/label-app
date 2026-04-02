@@ -91,7 +91,10 @@ export function Label_3x4_New({ data }) {
           transformOrigin: "top left",
           display: "flex",
           flexDirection: "column",
-          padding: "8px 10px",
+          paddingTop: "20px",      /* visual LEFT margin */
+          paddingBottom: "6px",    /* visual RIGHT margin (less, to shift content left) */
+          paddingLeft: "12px",     /* visual BOTTOM margin */
+          paddingRight: "20px",    /* visual TOP margin */
           boxSizing: "border-box",
           gap: "6px",
         }}
