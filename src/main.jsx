@@ -16,6 +16,7 @@ import GroshaatPage from "./pages/Groshaat.jsx";
 import JarPage from "./pages/Jar.jsx";
 import KattaPage from "./pages/Katta.jsx";
 import NewLabelsPage from "./pages/NewLabels.jsx";
+import NewLabels_3x3_Page from "./pages/NewLabels_3x3.jsx";
 import UploadLabels from "./pages/UploadLabels.jsx";
 import ManageLabels from "./pages/ManageLabels.jsx";
 
@@ -32,6 +33,7 @@ const router = createHashRouter([
       { path: "jar", element: <JarPage /> },
       { path: "katta", element: <KattaPage /> },
       { path: "new-labels", element: <NewLabelsPage /> },
+      { path: "new-labels-3x3", element: <NewLabels_3x3_Page /> },
       { path: "upload", element: <UploadLabels /> },
       { path: "manage", element: <ManageLabels /> },
     ],
