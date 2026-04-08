@@ -109,7 +109,15 @@ export default function AppShellLayout() {
             component={Link}
             to="/new-labels"
             label="New Labels (3x4)"
-            active={pathname.startsWith("/new-labels")}
+            active={pathname.startsWith("/new-labels") && !pathname.startsWith("/new-labels-3x3")}
+            styles={{ label: { color: "black", fontWeight: 700 } }}
+          />
+
+          <NavLink
+            component={Link}
+            to="/new-labels-3x3"
+            label="New Labels (3x3)"
+            active={pathname.startsWith("/new-labels-3x3")}
             styles={{ label: { color: "black", fontWeight: 700 } }}
           />
 
