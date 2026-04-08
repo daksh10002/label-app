@@ -27,7 +27,7 @@ import { supabase } from "../supabaseClient.js";
 // --- CONFIG YOU CAN TWEAK ---
 const ALLOWED_BRANDS = ["Goshudh", "Trinetra", "Groshaat"];
 // The style_code values your app uses
-const ALLOWED_STYLE_CODES = ["2x4in", "3x4in", "3x4in_new", "38x25mm", "38x24mm"];
+const ALLOWED_STYLE_CODES = ["2x4in", "3x4in", "3x4in_new", "3x3in", "38x25mm", "38x24mm"];
 
 // Columns we accept for CSV bulk upload (order not required, header names must match)
 const CSV_COLUMNS = [
@@ -68,7 +68,8 @@ function validateRow(row, indexForMsg = null) {
   if (!name) errors.push("name is required");
 
   const brand = toStrOrNull(row.brand);
-  if (!brand || !ALLOWED_BRANDS.includes(brand))
+  const isGeneric = row.style_code === "3x3in" || row.style_code === "3x4in_new";
+  if (!isGeneric && (!brand || !ALLOWED_BRANDS.includes(brand)))
     errors.push(`brand must be one of ${ALLOWED_BRANDS.join(", ")}`);
 
   const batch_no = toStrOrNull(row.batch_no);
@@ -305,7 +306,7 @@ export default function UploadLabels() {
                     value={sBrand}
                     onChange={setSBrand}
                     searchable
-                    required
+                    required={!(sStyle === "3x3in" || sStyle === "3x4in_new")}
                   />
                 </Group>
 
