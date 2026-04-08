@@ -15,11 +15,13 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 import { Label_2x4_Goshudh } from "../templates/Label_2x4_Goshudh.jsx";
 import { Label_3x4_Goshudh } from "../templates/Label_3x4_Goshudh.jsx";
 import { Label_3x4_New } from "../templates/Label_3x4_New.jsx";
+import { Label_3x3 } from "../templates/Label_3x3.jsx";
 
 /* ---------- STYLE CONSTANTS (inches) ---------- */
 export const STYLE_2X4 = { style_code: "2x4in", width_in: 4, height_in: 2 };
 export const STYLE_3X4 = { style_code: "3x4in", width_in: 4, height_in: 3 };
 export const STYLE_3X4_NEW = { style_code: "3x4in_new", width_in: 4, height_in: 3 };
+export const STYLE_3X3 = { style_code: "3x3in", width_in: 3, height_in: 3 };
 
 // exact-size panel style for preview/export container
 export function exactPanelStyle(style) {
@@ -78,6 +80,10 @@ export function pickTemplate(row) {
     return { Component: Label_3x4_New, style: STYLE_3X4_NEW, style_code: "3x4in_new" };
   }
 
+  if (code === "3x3" || code === "3x3in") {
+    return { Component: Label_3x3, style: STYLE_3X3, style_code: "3x3in" };
+  }
+
   // default / fallback
   return { Component: Label_2x4_Goshudh, style: STYLE_2X4, style_code: "2x4in" };
 }
@@ -119,6 +125,7 @@ export function decideStyleCode(input) {
   if (input && typeof input === "object" && input.style_code) {
     const c = String(input.style_code).toLowerCase();
     if (c.includes("3x4in_new")) return "3x4in_new";
+    if (c.includes("3x3")) return "3x3in";
     if (c.includes("3x4")) return "3x4in";
     if (c.includes("2x4")) return "2x4in";
   }
@@ -126,6 +133,7 @@ export function decideStyleCode(input) {
   if (typeof input === "string") {
     const c = input.toLowerCase();
     if (c.includes("3x4in_new")) return "3x4in_new";
+    if (c.includes("3x3")) return "3x3in";
     if (c.includes("3x4")) return "3x4in";
     if (c.includes("2x4")) return "2x4in";
   }
