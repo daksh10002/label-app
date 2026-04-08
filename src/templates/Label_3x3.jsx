@@ -30,12 +30,12 @@ export function Label_3x3({ data }) {
   const todayMY = formatMonthYear(new Date());
   const useByText = formatMonthYearFromInput(use_by);
 
-  const BORDER = "1.5px solid #000";
+  const BORDER = "0.5px solid #333";
   const td = {
     border: BORDER,
-    padding: "1px 4px",
-    lineHeight: 1.0,
-    fontSize: "9px",
+    padding: "5px 8px",
+    lineHeight: 1.2,
+    fontSize: "12px",
     verticalAlign: "middle",
   };
 
@@ -96,8 +96,8 @@ export function Label_3x3({ data }) {
           style={{
             border: BORDER,
             padding: "3px 6px",
-            fontSize: "11px",
-            fontWeight: 700,
+            fontSize: "10.5px",
+            fontWeight: 600,
             whiteSpace: "normal",
             wordBreak: "break-word",
             textAlign: "left",
@@ -111,12 +111,14 @@ export function Label_3x3({ data }) {
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div
             style={{
-              background: "#000",
-              color: "#fff",
+              border: BORDER,
+              borderBottom: "none",
               textAlign: "center",
-              fontWeight: 700,
-              fontSize: "12px",
-              padding: "1px 0",
+              fontWeight: 800,
+              fontSize: "13.5px",
+              padding: "3px 0",
+              backgroundColor: "transparent",
+              color: "#000",
             }}
           >
             Nutritional Value
@@ -124,12 +126,13 @@ export function Label_3x3({ data }) {
           <div
             style={{
               textAlign: "center",
-              fontSize: "9px",
+              fontSize: "10px",
               fontWeight: 700,
-              padding: "0 0",
+              padding: "2px 0",
               border: BORDER,
-              borderTop: "none",
               borderBottom: "none",
+              backgroundColor: "transparent",
+              color: "#000",
             }}
           >
             Per 100g Approx
@@ -146,23 +149,23 @@ export function Label_3x3({ data }) {
             <tbody>
               <tr>
                 <td style={td}>Calories</td>
-                <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{calories}</td>
+                <td style={{ ...td, textAlign: "right", fontWeight: 600 }}>{calories}</td>
               </tr>
               <tr>
                 <td style={td}>Carbohydrates</td>
-                <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{carbohydrates}</td>
+                <td style={{ ...td, textAlign: "right", fontWeight: 600 }}>{carbohydrates}</td>
               </tr>
               <tr>
                 <td style={td}>Fats</td>
-                <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{fats}</td>
+                <td style={{ ...td, textAlign: "right", fontWeight: 600 }}>{fats}</td>
               </tr>
               <tr>
                 <td style={td}>Protein</td>
-                <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{protein}</td>
+                <td style={{ ...td, textAlign: "right", fontWeight: 600 }}>{protein}</td>
               </tr>
               <tr>
-                <td style={td}>Cholestrol</td>
-                <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{cholesterol}</td>
+                <td style={td}>Cholesterol</td>
+                <td style={{ ...td, textAlign: "right", fontWeight: 600 }}>{cholesterol}</td>
               </tr>
             </tbody>
           </table>
@@ -176,7 +179,7 @@ export function Label_3x3({ data }) {
             columnGap: "4px",
             rowGap: "2px",
             fontSize: "11px",
-            fontWeight: 700,
+            fontWeight: 600,
             marginTop: "2px",
           }}
         >
