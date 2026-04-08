@@ -1,4 +1,4 @@
-// src/pages/NewLabels.jsx
+// src/pages/NewLabels_3x3.jsx
 import { useEffect, useRef, useState, useMemo } from "react";
 import {
   Button,
@@ -15,9 +15,9 @@ import {
 import { supabase } from "../supabaseClient.js";
 import { downloadNodeAsPdf } from "../lib/exportSingle.js";
 import { printNodeDirect } from "../lib/printDirect.js";
-import { Label_3x4_New } from "../templates/Label_3x4_New.jsx";
+import { Label_3x3 } from "../templates/Label_3x3.jsx";
 
-export default function NewLabelsPage() {
+export default function NewLabels_3x3_Page() {
   const [rows, setRows] = useState([]);
   const [id, setId] = useState(null);
   const [copies, setCopies] = useState(1);
@@ -32,7 +32,7 @@ export default function NewLabelsPage() {
         .from("simple_labels")
         .select("*")
         .eq("is_active", true)
-        .eq("style_code", "3x4in_new")
+        .eq("style_code", "3x3in")
         .order("name", { ascending: true });
 
       if (!error) {
@@ -53,9 +53,9 @@ export default function NewLabelsPage() {
   const handleDownload = async () => {
     if (!previewRef.current || !row) return;
     await downloadNodeAsPdf(previewRef.current, {
-      widthIn: 4,
+      widthIn: 3,
       heightIn: 3,
-      filename: `new_label_${row.name || "label"}.pdf`,
+      filename: `3x3_label_${row.name || "label"}.pdf`,
       copies,
     });
   };
@@ -63,17 +63,17 @@ export default function NewLabelsPage() {
   const handleDirectPrint = async () => {
     if (!previewRef.current || !row) return;
     await printNodeDirect(previewRef.current, {
-      widthIn: 4,
+      widthIn: 3,
       heightIn: 3,
       copies,
-      title: `New Label – ${row.name}`,
+      title: `3x3 Label – ${row.name}`,
     });
   };
 
   return (
     <Container size="lg" py="md">
       <Stack gap="md">
-        <Title order={2}>New Labels (3×4″ Horizontal)</Title>
+        <Title order={2}>New Labels (3×3″ Vertical)</Title>
 
         <Group gap="sm" wrap="wrap">
           <Select
@@ -116,12 +116,12 @@ export default function NewLabelsPage() {
             <div
               ref={previewRef}
               style={{
-                width: "4in",
+                width: "3in",
                 height: "3in",
                 background: "#fff",
               }}
             >
-              <Label_3x4_New data={row} />
+              <Label_3x3 data={row} />
             </div>
           </Card>
         )}
