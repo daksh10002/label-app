@@ -72,16 +72,7 @@ export default function AppShellLayout() {
             active={pathname.startsWith("/trinetra")}
             styles={{ label: { color: "black" } }}
           />
-      
-          <NavLink
-            component={Link}
-            to="/groshaat"
-            label="Groshaat"
-            active={pathname.startsWith("/groshaat")}
-            styles={{ label: { color: "black" } }}
-          />
          
-
           {/* Collapsible group for smaller sticker sizes */}
           <NavLink
             label="Small Stickers"
