@@ -68,27 +68,37 @@ export function Label_3x3({ data }) {
   };
 
   return (
-    <div
-      style={{
-        width: "3in",
-        height: "3in",
-        background: "#fff",
-        color: "#000",
-        fontFamily: "Arial, Helvetica, sans-serif",
-        boxSizing: "border-box",
-        overflow: "hidden",
-        position: "relative",
-      }}
-    >
+    <>
+      <style>{`
+        @media print {
+          .print-rotate {
+            transform: rotate(-90deg);
+            transform-origin: center center;
+          }
+        }
+      `}</style>
       <div
+        className="print-rotate"
         style={{
-          width: "100%",
-          height: "100%",
-          display: "block",
-          padding: "5px 10px",
+          width: "3in",
+          height: "3in",
+          background: "#fff",
+          color: "#000",
+          fontFamily: "Arial, Helvetica, sans-serif",
           boxSizing: "border-box",
+          overflow: "hidden",
+          position: "relative",
         }}
       >
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "block",
+            padding: "5px 10px",
+            boxSizing: "border-box",
+          }}
+        >
         {/* Row 1: Ingredients */}
         <div
           style={{
@@ -110,7 +120,7 @@ export function Label_3x3({ data }) {
         <div style={{ display: "block", marginBottom: "3px" }}>
           <div
             style={{
-              background: "#000",
+              background: "#444",
               color: "#fff",
               textAlign: "center",
               fontWeight: 700,
@@ -203,6 +213,7 @@ export function Label_3x3({ data }) {
           <div>{useByText}</div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
