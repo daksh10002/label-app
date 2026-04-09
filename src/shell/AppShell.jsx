@@ -11,7 +11,6 @@ export default function AppShell() {
             <Nav to="/">Home</Nav>
             <Nav to="/goshudh">Goshudh</Nav>
             <Nav to="/trinetra">Trinetra</Nav>
-            <Nav to="/groshaat">Groshaat</Nav>
             <Nav to="/jar">Jar</Nav>
           </nav>
         </div>
