@@ -84,31 +84,30 @@ export function Label_3x3({ data }) {
         style={{
           width: "100%",
           height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          padding: "8px 10px",
+          display: "block",
+          padding: "5px 10px",
           boxSizing: "border-box",
-          gap: "6px",
         }}
       >
         {/* Row 1: Ingredients */}
         <div
           style={{
             border: BORDER,
-            padding: "3px 6px",
-            fontSize: "11px",
+            padding: "5px 6px",
+            fontSize: "13.5px",
             fontWeight: 700,
             whiteSpace: "normal",
             wordBreak: "break-word",
             textAlign: "left",
             lineHeight: 1.2,
+            marginBottom: "3px", /* replaces gap */
           }}
         >
           Ingredients: {ingredients || name}
         </div>
 
         {/* Row 2: Nutritional Value */}
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "block", marginBottom: "3px" }}>
           <div
             style={{
               background: "#000",
