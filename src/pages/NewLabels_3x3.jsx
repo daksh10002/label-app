@@ -53,7 +53,7 @@ export default function NewLabels_3x3_Page() {
   const handleDownload = async () => {
     if (!previewRef.current || !row) return;
     await downloadNodeAsPdf(previewRef.current, {
-      widthIn: 3,
+      widthIn: 4,
       heightIn: 3,
       filename: `3x3_label_${row.name || "label"}.pdf`,
       copies,
@@ -63,7 +63,7 @@ export default function NewLabels_3x3_Page() {
   const handleDirectPrint = async () => {
     if (!previewRef.current || !row) return;
     await printNodeDirect(previewRef.current, {
-      widthIn: 3,
+      widthIn: 4,
       heightIn: 3,
       copies,
       title: `3x3 Label – ${row.name}`,
@@ -116,7 +116,7 @@ export default function NewLabels_3x3_Page() {
             <div
               ref={previewRef}
               style={{
-                width: "3in",
+                width: "4in",
                 height: "3in",
                 background: "#fff",
               }}
