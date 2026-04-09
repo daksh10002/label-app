@@ -33,9 +33,9 @@ export function Label_3x3({ data }) {
   const BORDER = "1.5px solid #000";
   const td = {
     border: BORDER,
-    padding: "2px 4px",
-    lineHeight: 1.1,
-    fontSize: "9px",
+    padding: "2px 5px",
+    lineHeight: 1.15,
+    fontSize: "10px",
     verticalAlign: "middle",
   };
 
@@ -88,26 +88,26 @@ export function Label_3x3({ data }) {
           flexDirection: "column",
           padding: "8px 10px",
           boxSizing: "border-box",
-          gap: "4px",
+          gap: "6px",
         }}
       >
-        {/* Row 1: Ingredients (Becomes Left Column) */}
+        {/* Row 1: Ingredients */}
         <div
           style={{
             border: BORDER,
             padding: "3px 6px",
-            fontSize: "10.5px",
+            fontSize: "11px",
             fontWeight: 700,
             whiteSpace: "normal",
             wordBreak: "break-word",
             textAlign: "left",
-            lineHeight: 1.15,
+            lineHeight: 1.2,
           }}
         >
           Ingredients: {ingredients || name}
         </div>
 
-        {/* Row 2: Nutritional Value (Becomes Middle Column) */}
+        {/* Row 2: Nutritional Value */}
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div
             style={{
@@ -115,7 +115,7 @@ export function Label_3x3({ data }) {
               color: "#fff",
               textAlign: "center",
               fontWeight: 700,
-              fontSize: "13px",
+              fontSize: "14px",
               padding: "2px 0",
             }}
           >
@@ -124,7 +124,7 @@ export function Label_3x3({ data }) {
           <div
             style={{
               textAlign: "center",
-              fontSize: "9px",
+              fontSize: "10px",
               fontWeight: 700,
               padding: "1px 0",
               border: BORDER,
@@ -168,14 +168,14 @@ export function Label_3x3({ data }) {
           </table>
         </div>
 
-        {/* Row 3: Details (Becomes Right Column) */}
+        {/* Row 3: Details */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "1.2fr 6px 1fr",
             columnGap: "4px",
-            rowGap: "2px",
-            fontSize: "10px",
+            rowGap: "3px",
+            fontSize: "11px",
             fontWeight: 700,
             marginTop: "2px",
           }}
@@ -190,7 +190,7 @@ export function Label_3x3({ data }) {
 
           <div style={{ lineHeight: 1 }}>
             MRP.
-            <div style={{ fontSize: "7px", fontWeight: 500 }}>(Inclusive of all taxes)</div>
+            <div style={{ fontSize: "8px", fontWeight: 500 }}>(Inclusive of all taxes)</div>
           </div>
           <div>:</div>
           <div>{mrpText}</div>
