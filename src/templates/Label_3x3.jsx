@@ -30,12 +30,12 @@ export function Label_3x3({ data }) {
   const todayMY = formatMonthYear(new Date());
   const useByText = formatMonthYearFromInput(use_by);
 
-  const BORDER = "0.5px solid #333";
+  const BORDER = "1.5px solid #000";
   const td = {
     border: BORDER,
-    padding: "5px 8px",
-    lineHeight: 1.2,
-    fontSize: "12px",
+    padding: "2px 4px",
+    lineHeight: 1.1,
+    fontSize: "9px",
     verticalAlign: "middle",
   };
 
@@ -86,39 +86,37 @@ export function Label_3x3({ data }) {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          padding: "8px",
+          padding: "8px 10px",
           boxSizing: "border-box",
-          gap: "6px",
+          gap: "4px",
         }}
       >
-        {/* Row 1: Ingredients */}
+        {/* Row 1: Ingredients (Becomes Left Column) */}
         <div
           style={{
             border: BORDER,
             padding: "3px 6px",
             fontSize: "10.5px",
-            fontWeight: 600,
+            fontWeight: 700,
             whiteSpace: "normal",
             wordBreak: "break-word",
             textAlign: "left",
-            lineHeight: 1.1,
+            lineHeight: 1.15,
           }}
         >
           Ingredients: {ingredients || name}
         </div>
 
-        {/* Row 2: Nutritional Value */}
+        {/* Row 2: Nutritional Value (Becomes Middle Column) */}
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div
             style={{
-              border: BORDER,
-              borderBottom: "none",
+              background: "#000",
+              color: "#fff",
               textAlign: "center",
-              fontWeight: 800,
-              fontSize: "13.5px",
-              padding: "3px 0",
-              backgroundColor: "transparent",
-              color: "#000",
+              fontWeight: 700,
+              fontSize: "13px",
+              padding: "2px 0",
             }}
           >
             Nutritional Value
@@ -126,13 +124,12 @@ export function Label_3x3({ data }) {
           <div
             style={{
               textAlign: "center",
-              fontSize: "10px",
+              fontSize: "9px",
               fontWeight: 700,
-              padding: "2px 0",
+              padding: "1px 0",
               border: BORDER,
+              borderTop: "none",
               borderBottom: "none",
-              backgroundColor: "transparent",
-              color: "#000",
             }}
           >
             Per 100g Approx
@@ -149,37 +146,37 @@ export function Label_3x3({ data }) {
             <tbody>
               <tr>
                 <td style={td}>Calories</td>
-                <td style={{ ...td, textAlign: "right", fontWeight: 600 }}>{calories}</td>
+                <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{calories}</td>
               </tr>
               <tr>
                 <td style={td}>Carbohydrates</td>
-                <td style={{ ...td, textAlign: "right", fontWeight: 600 }}>{carbohydrates}</td>
+                <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{carbohydrates}</td>
               </tr>
               <tr>
                 <td style={td}>Fats</td>
-                <td style={{ ...td, textAlign: "right", fontWeight: 600 }}>{fats}</td>
+                <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{fats}</td>
               </tr>
               <tr>
                 <td style={td}>Protein</td>
-                <td style={{ ...td, textAlign: "right", fontWeight: 600 }}>{protein}</td>
+                <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{protein}</td>
               </tr>
               <tr>
-                <td style={td}>Cholesterol</td>
-                <td style={{ ...td, textAlign: "right", fontWeight: 600 }}>{cholesterol}</td>
+                <td style={td}>Cholestrol</td>
+                <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{cholesterol}</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        {/* Row 3: Details */}
+        {/* Row 3: Details (Becomes Right Column) */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 6px 1fr",
+            gridTemplateColumns: "1.2fr 6px 1fr",
             columnGap: "4px",
             rowGap: "2px",
-            fontSize: "11px",
-            fontWeight: 600,
+            fontSize: "10px",
+            fontWeight: 700,
             marginTop: "2px",
           }}
         >
@@ -193,7 +190,7 @@ export function Label_3x3({ data }) {
 
           <div style={{ lineHeight: 1 }}>
             MRP.
-            <div style={{ fontSize: "8px", fontWeight: 400 }}>(Incl. of all taxes)</div>
+            <div style={{ fontSize: "7px", fontWeight: 500 }}>(Inclusive of all taxes)</div>
           </div>
           <div>:</div>
           <div>{mrpText}</div>
