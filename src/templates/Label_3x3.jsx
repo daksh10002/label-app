@@ -87,7 +87,7 @@ export function Label_3x3({ data }) {
           width: "3in",
           height: "3in",
           display: "block",
-          padding: "5px 10px",
+          padding: "15px 10px 5px 10px", // Shifted down (increased from 5px to 15px)
           boxSizing: "border-box",
         }}
       >
@@ -146,23 +146,23 @@ export function Label_3x3({ data }) {
           >
             <tbody>
               <tr>
-                <td style={td}>Calories</td>
+                <td style={{ ...td, fontWeight: 700 }}>Calories</td>
                 <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{calories}</td>
               </tr>
               <tr>
-                <td style={td}>Carbohydrates</td>
+                <td style={{ ...td, fontWeight: 700 }}>Carbohydrates</td>
                 <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{carbohydrates}</td>
               </tr>
               <tr>
-                <td style={td}>Fats</td>
+                <td style={{ ...td, fontWeight: 700 }}>Fats</td>
                 <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{fats}</td>
               </tr>
               <tr>
-                <td style={td}>Protein</td>
+                <td style={{ ...td, fontWeight: 700 }}>Protein</td>
                 <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{protein}</td>
               </tr>
               <tr>
-                <td style={td}>Cholestrol</td>
+                <td style={{ ...td, fontWeight: 700 }}>Cholestrol</td>
                 <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>{cholesterol}</td>
               </tr>
             </tbody>
