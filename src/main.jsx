@@ -12,7 +12,6 @@ import AppShellLayout from "./shell/AppShellLayout.jsx";
 import Home from "./pages/Home.jsx";
 import GoshudhPage from "./pages/Goshudh.jsx";
 import TrinetraPage from "./pages/Trinetra.jsx";
-import GroshaatPage from "./pages/Groshaat.jsx";
 import JarPage from "./pages/Jar.jsx";
 import KattaPage from "./pages/Katta.jsx";
 import NewLabelsPage from "./pages/NewLabels.jsx";
@@ -29,7 +28,6 @@ const router = createHashRouter([
       { index: true, element: <Home /> },
       { path: "goshudh", element: <GoshudhPage /> },
       { path: "trinetra", element: <TrinetraPage /> },
-      { path: "groshaat", element: <GroshaatPage /> },
       { path: "jar", element: <JarPage /> },
       { path: "katta", element: <KattaPage /> },
       { path: "new-labels", element: <NewLabelsPage /> },
