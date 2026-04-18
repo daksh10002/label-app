@@ -9,7 +9,6 @@ export default function AppShell() {
           <div className="font-extrabold tracking-wide">Sticker Studio</div>
           <nav className="ml-auto flex gap-2">
             <Nav to="/">Home</Nav>
-            <Nav to="/goshudh">Goshudh</Nav>
             <Nav to="/trinetra">Trinetra</Nav>
             <Nav to="/jar">Jar</Nav>
           </nav>
