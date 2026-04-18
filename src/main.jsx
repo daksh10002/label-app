@@ -10,7 +10,6 @@ import AppShellLayout from "./shell/AppShellLayout.jsx";
 // 🏷️ Pages
 // 🏷️ Pages
 import Home from "./pages/Home.jsx";
-import GoshudhPage from "./pages/Goshudh.jsx";
 import TrinetraPage from "./pages/Trinetra.jsx";
 import JarPage from "./pages/Jar.jsx";
 import KattaPage from "./pages/Katta.jsx";
@@ -26,7 +25,6 @@ const router = createHashRouter([
     element: <AppShellLayout />,
     children: [
       { index: true, element: <Home /> },
-      { path: "goshudh", element: <GoshudhPage /> },
       { path: "trinetra", element: <TrinetraPage /> },
       { path: "jar", element: <JarPage /> },
       { path: "katta", element: <KattaPage /> },
