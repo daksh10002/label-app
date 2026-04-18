@@ -96,7 +96,7 @@ export function Label_3x3({ data }) {
           style={{
             border: BORDER,
             padding: "5px 6px",
-            fontSize: "13.5px",
+            fontSize: "12.5px",
             fontWeight: 700,
             whiteSpace: "normal",
             wordBreak: "break-word",
