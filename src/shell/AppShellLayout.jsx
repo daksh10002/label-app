@@ -56,15 +56,7 @@ export default function AppShellLayout() {
             styles={{ label: { color: "black" } }}
           />
 
-          {/* Brand Labels */}
-          <NavLink
-            component={Link}
-            to="/goshudh"
-            label="Goshudh"
-            active={pathname.startsWith("/goshudh")}
-            styles={{ label: { color: "black" } }}
-          />
-          
+
           <NavLink
             component={Link}
             to="/trinetra"
@@ -72,7 +64,7 @@ export default function AppShellLayout() {
             active={pathname.startsWith("/trinetra")}
             styles={{ label: { color: "black" } }}
           />
-         
+
           {/* Collapsible group for smaller sticker sizes */}
           <NavLink
             label="Small Stickers"
