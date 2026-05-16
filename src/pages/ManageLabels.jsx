@@ -228,8 +228,13 @@ export default function ManageLabels() {
     if (updates.fats !== undefined && updates.fats !== "") updates.fats = `${updates.fats} g`;
     if (updates.protein !== undefined && updates.protein !== "") updates.protein = `${updates.protein} g`;
     if (updates.cholesterol !== undefined && updates.cholesterol !== "") updates.cholesterol = `${updates.cholesterol} g`;
+    if (updates.sodium !== undefined && updates.sodium !== "") updates.sodium = `${updates.sodium} mg`;
+    if (updates.calcium !== undefined && updates.calcium !== "") updates.calcium = `${updates.calcium} mg`;
+    if (updates.potassium !== undefined && updates.potassium !== "") updates.potassium = `${updates.potassium} mg`;
+    if (updates.magnesium !== undefined && updates.magnesium !== "") updates.magnesium = `${updates.magnesium} mg`;
+    if (updates.iron !== undefined && updates.iron !== "") updates.iron = `${updates.iron} mg`;
 
-    const isGeneric = editing.style_code === "3x3in" || editing.style_code === "3x4in_new";
+    const isGeneric = editing.style_code === "3x3in" || editing.style_code === "3x4in_new" || editing.style_code === "3x3salt_in";
     if (!updates.name || (!isGeneric && !updates.brand) || !updates.batch_no) {
       setSaving(false);
       setMsg({ type: "error", text: isGeneric ? "Name and Batch No. are required" : "Name, Brand and Batch No. are required" });
@@ -255,6 +260,11 @@ export default function ManageLabels() {
       fats: parseUnitValue(r.fats),
       protein: parseUnitValue(r.protein),
       cholesterol: parseUnitValue(r.cholesterol),
+      sodium: parseUnitValue(r.sodium),
+      calcium: parseUnitValue(r.calcium),
+      potassium: parseUnitValue(r.potassium),
+      magnesium: parseUnitValue(r.magnesium),
+      iron: parseUnitValue(r.iron),
     });
   };
 
@@ -690,17 +700,17 @@ export default function ManageLabels() {
           <Stack>
             <TextInput label="Name *" placeholder="Product name" value={editing.name || ""} onChange={(e) => setEditing({ ...editing, name: e.currentTarget.value })} required />
             <TextInput 
-              label={`Brand${(editing.style_code === "3x3in" || editing.style_code === "3x4in_new") ? "" : " *"}`} 
+              label={`Brand${(editing.style_code === "3x3in" || editing.style_code === "3x4in_new" || editing.style_code === "3x3salt_in") ? "" : " *"}`} 
               placeholder="Select brand" 
               value={editing.brand || ""} 
               onChange={(e) => setEditing({ ...editing, brand: e.currentTarget.value })} 
-              required={!(editing.style_code === "3x3in" || editing.style_code === "3x4in_new")} 
+              required={!(editing.style_code === "3x3in" || editing.style_code === "3x4in_new" || editing.style_code === "3x3salt_in")} 
             />
             <TextInput label="Batch No. *" placeholder="e.g., GS-0001" value={editing.batch_no || ""} onChange={(e) => setEditing({ ...editing, batch_no: e.currentTarget.value })} required />
             <NumberInput label="MRP (₹)" placeholder="e.g., 199" value={editing.mrp || ""} onChange={(v) => setEditing({ ...editing, mrp: v })} />
             <NumberInput label="Net Weight (g) *" placeholder="e.g., 250" value={editing.net_weight_g || ""} onChange={(v) => setEditing({ ...editing, net_weight_g: v })} required />
             <NumberInput label="Shelf Life (months) *" placeholder="6" value={editing.shelf_life_months || ""} onChange={(v) => setEditing({ ...editing, shelf_life_months: v })} required />
-            <Select label="Style Code *" placeholder="Select size" value={editing.style_code} onChange={(v) => setEditing({ ...editing, style_code: v })} data={["2x4in", "3x4in", "3x4in_new", "3x3in", "38x25mm", "38x24mm"]} required />
+            <Select label="Style Code *" placeholder="Select size" value={editing.style_code} onChange={(v) => setEditing({ ...editing, style_code: v })} data={["2x4in", "3x4in", "3x4in_new", "3x3in", "3x3salt_in", "38x25mm", "38x24mm"]} required />
             <Textarea label="Ingredients" placeholder="Comma/space separated or uppercase words" value={editing.ingredients || ""} onChange={(e) => setEditing({ ...editing, ingredients: e.currentTarget.value })} autosize minRows={2} />
             <Group grow>
               <NumberInput label="Calories (Kcal)" value={editing.calories} onChange={(v) => setEditing({ ...editing, calories: v })} min={0} />
@@ -710,6 +720,16 @@ export default function ManageLabels() {
               <NumberInput label="Fats (g)" value={editing.fats} onChange={(v) => setEditing({ ...editing, fats: v })} min={0} />
               <NumberInput label="Protein (g)" value={editing.protein} onChange={(v) => setEditing({ ...editing, protein: v })} min={0} />
               <NumberInput label="Cholesterol (g)" value={editing.cholesterol} onChange={(v) => setEditing({ ...editing, cholesterol: v })} min={0} />
+            </Group>
+
+            <Group grow>
+              <NumberInput label="Sodium (mg)" value={editing.sodium} onChange={(v) => setEditing({ ...editing, sodium: v })} min={0} />
+              <NumberInput label="Calcium (mg)" value={editing.calcium} onChange={(v) => setEditing({ ...editing, calcium: v })} min={0} />
+              <NumberInput label="Potassium (mg)" value={editing.potassium} onChange={(v) => setEditing({ ...editing, potassium: v })} min={0} />
+            </Group>
+            <Group grow>
+              <NumberInput label="Magnesium (mg)" value={editing.magnesium} onChange={(v) => setEditing({ ...editing, magnesium: v })} min={0} />
+              <NumberInput label="Iron (mg)" value={editing.iron} onChange={(v) => setEditing({ ...editing, iron: v })} min={0} />
             </Group>
 
             <Switch label="Active" description="Inactive labels won't appear in printing dropdowns" checked={editing.is_active ?? true} onChange={(e) => setEditing({ ...editing, is_active: e.currentTarget.checked })} />
