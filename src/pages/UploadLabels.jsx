@@ -27,7 +27,7 @@ import { supabase } from "../supabaseClient.js";
 // --- CONFIG YOU CAN TWEAK ---
 const ALLOWED_BRANDS = ["Goshudh", "Trinetra", "Groshaat"];
 // The style_code values your app uses
-const ALLOWED_STYLE_CODES = ["2x4in", "3x4in", "3x4in_new", "3x3in", "38x25mm", "38x24mm"];
+const ALLOWED_STYLE_CODES = ["2x4in", "3x4in", "3x4in_new", "3x3in", "3x3salt_in", "38x25mm", "38x24mm"];
 
 // Columns we accept for CSV bulk upload (order not required, header names must match)
 const CSV_COLUMNS = [
@@ -44,6 +44,11 @@ const CSV_COLUMNS = [
   "fats",
   "protein",
   "cholesterol",
+  "sodium",
+  "calcium",
+  "potassium",
+  "magnesium",
+  "iron",
 ];
 
 // Utility: coerce number or return null if empty/invalid
@@ -68,7 +73,7 @@ function validateRow(row, indexForMsg = null) {
   if (!name) errors.push("name is required");
 
   const brand = toStrOrNull(row.brand);
-  const isGeneric = row.style_code === "3x3in" || row.style_code === "3x4in_new";
+  const isGeneric = row.style_code === "3x3in" || row.style_code === "3x4in_new" || row.style_code === "3x3salt_in";
   if (!isGeneric && (!brand || !ALLOWED_BRANDS.includes(brand)))
     errors.push(`brand must be one of ${ALLOWED_BRANDS.join(", ")}`);
 
@@ -115,6 +120,11 @@ function validateRow(row, indexForMsg = null) {
       fats: toStrOrNull(row.fats),
       protein: toStrOrNull(row.protein),
       cholesterol: toStrOrNull(row.cholesterol),
+      sodium: toStrOrNull(row.sodium),
+      calcium: toStrOrNull(row.calcium),
+      potassium: toStrOrNull(row.potassium),
+      magnesium: toStrOrNull(row.magnesium),
+      iron: toStrOrNull(row.iron),
       // pkd_on: let DB default (today/first-of-month per your server logic)
       // use_by: computed server-side/trigger or function (recommended)
     },
@@ -137,6 +147,11 @@ export default function UploadLabels() {
   const [sFat, setSFat] = useState("");
   const [sProt, setSProt] = useState("");
   const [sChol, setSChol] = useState("");
+  const [sSodium, setSSodium] = useState("");
+  const [sCalcium, setSCalcium] = useState("");
+  const [sPotassium, setSPotassium] = useState("");
+  const [sMagnesium, setSMagnesium] = useState("");
+  const [sIron, setSIron] = useState("");
 
   const [singleBusy, setSingleBusy] = useState(false);
   const [singleMsg, setSingleMsg] = useState(null);
@@ -190,6 +205,11 @@ export default function UploadLabels() {
         fats: sFat !== "" ? `${sFat} g` : null,
         protein: sProt !== "" ? `${sProt} g` : null,
         cholesterol: sChol !== "" ? `${sChol} g` : null,
+        sodium: sSodium !== "" ? `${sSodium} mg` : null,
+        calcium: sCalcium !== "" ? `${sCalcium} mg` : null,
+        potassium: sPotassium !== "" ? `${sPotassium} mg` : null,
+        magnesium: sMagnesium !== "" ? `${sMagnesium} mg` : null,
+        iron: sIron !== "" ? `${sIron} mg` : null,
       },
       null
     );
@@ -402,6 +422,46 @@ export default function UploadLabels() {
                     placeholder="e.g. 0"
                     value={sChol}
                     onChange={setSChol}
+                    min={0}
+                  />
+                </Group>
+
+                <Group grow>
+                  <NumberInput
+                    label="Sodium (mg)"
+                    placeholder="e.g. 230"
+                    value={sSodium}
+                    onChange={setSSodium}
+                    min={0}
+                  />
+                  <NumberInput
+                    label="Calcium (mg)"
+                    placeholder="e.g. 500"
+                    value={sCalcium}
+                    onChange={setSCalcium}
+                    min={0}
+                  />
+                  <NumberInput
+                    label="Potassium (mg)"
+                    placeholder="e.g. 4600"
+                    value={sPotassium}
+                    onChange={setSPotassium}
+                    min={0}
+                  />
+                </Group>
+                <Group grow>
+                  <NumberInput
+                    label="Magnesium (mg)"
+                    placeholder="e.g. 198"
+                    value={sMagnesium}
+                    onChange={setSMagnesium}
+                    min={0}
+                  />
+                  <NumberInput
+                    label="Iron (mg)"
+                    placeholder="e.g. 35.4"
+                    value={sIron}
+                    onChange={setSIron}
                     min={0}
                   />
                 </Group>
