@@ -16,12 +16,14 @@ import { Label_2x4_Goshudh } from "../templates/Label_2x4_Goshudh.jsx";
 import { Label_3x4_Goshudh } from "../templates/Label_3x4_Goshudh.jsx";
 import { Label_3x4_New } from "../templates/Label_3x4_New.jsx";
 import { Label_3x3 } from "../templates/Label_3x3.jsx";
+import { Label_3x3_Salt } from "../templates/Label_3x3_Salt.jsx";
 
 /* ---------- STYLE CONSTANTS (inches) ---------- */
 export const STYLE_2X4 = { style_code: "2x4in", width_in: 4, height_in: 2 };
 export const STYLE_3X4 = { style_code: "3x4in", width_in: 4, height_in: 3 };
 export const STYLE_3X4_NEW = { style_code: "3x4in_new", width_in: 4, height_in: 3 };
 export const STYLE_3X3 = { style_code: "3x3in", width_in: 3, height_in: 3 };
+export const STYLE_3X3_SALT = { style_code: "3x3salt_in", width_in: 3, height_in: 3 };
 
 // exact-size panel style for preview/export container
 export function exactPanelStyle(style) {
@@ -50,7 +52,8 @@ export async function loadBrandSimple(brand) {
       id, name, brand, style_code, batch_no,
       mrp, net_weight_g, shelf_life_months,
       pkd_on, use_by,
-      calories, carbohydrates, fats, protein, cholesterol
+      calories, carbohydrates, fats, protein, cholesterol,
+      sodium, calcium, potassium, magnesium, iron
     `
     )
     .eq("brand", brand)
@@ -84,6 +87,10 @@ export function pickTemplate(row) {
     return { Component: Label_3x3, style: STYLE_3X3, style_code: "3x3in" };
   }
 
+  if (code === "3x3salt" || code === "3x3salt_in") {
+    return { Component: Label_3x3_Salt, style: STYLE_3X3_SALT, style_code: "3x3salt_in" };
+  }
+
   // default / fallback
   return { Component: Label_2x4_Goshudh, style: STYLE_2X4, style_code: "2x4in" };
 }
@@ -103,6 +110,11 @@ export function toTemplateData(row) {
     fats: row?.fats ?? "—",
     protein: row?.protein ?? "—",
     cholesterol: row?.cholesterol ?? "—",
+    sodium: row?.sodium ?? "—",
+    calcium: row?.calcium ?? "—",
+    potassium: row?.potassium ?? "—",
+    magnesium: row?.magnesium ?? "—",
+    iron: row?.iron ?? "—",
   };
 }
 
@@ -125,6 +137,7 @@ export function decideStyleCode(input) {
   if (input && typeof input === "object" && input.style_code) {
     const c = String(input.style_code).toLowerCase();
     if (c.includes("3x4in_new")) return "3x4in_new";
+    if (c.includes("3x3salt")) return "3x3salt_in";
     if (c.includes("3x3")) return "3x3in";
     if (c.includes("3x4")) return "3x4in";
     if (c.includes("2x4")) return "2x4in";
@@ -133,6 +146,7 @@ export function decideStyleCode(input) {
   if (typeof input === "string") {
     const c = input.toLowerCase();
     if (c.includes("3x4in_new")) return "3x4in_new";
+    if (c.includes("3x3salt")) return "3x3salt_in";
     if (c.includes("3x3")) return "3x3in";
     if (c.includes("3x4")) return "3x4in";
     if (c.includes("2x4")) return "2x4in";
